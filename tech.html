@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html data-page-node-id="qTxpCIHoYMkJzsUM66nQNL" lang="zh-CN"><head data-page-node-id="NSSgSVqHxgYkHCXYjDwpMt">
+<meta data-page-node-id="Vcld4TXWRzWodaxQnnfBcp" charset="UTF-8">
+<meta data-page-node-id="xWUk2WBs2ppSqCJHwhoGKQ" name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-page-node-id="qUjCBrXGmNZDOmDvJcGA7H" data-pnid-children="Z2xS3U5VgldLaatMfAe0YJ">Tech — Simon</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style data-page-node-id="KLBXFtTFkdG3oGGxW50PeS" data-pnid-children="Py3AV0A93qrfuieIFtNIEc">
+  html{font-size:18px}  /* 13 英寸笔记本观看优化：根字号 16→18 */
+
+  /* ============================================================
+     Tech 子页面 · 完全自包含（不依赖任何本地 CSS）
+     ============================================================ */
+  :root{
+    --paper:#F1F0EA;--ink:#1C1B18;
+    --yellow:#F5D915;--magenta:#C9316E;--navy:#1F4E9C;
+    --teal:#7FC9E8;--lime:#B9D93B;--coral:#F0907E;--sky:#A8DCE8;
+    --pink:#F2A6C4;
+    --muted:#8b897f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;overflow-x:clip}
+  body{
+    font-family:"Noto Sans SC",sans-serif;
+    background:var(--paper);color:var(--ink);
+    overflow-x:hidden;position:relative;min-height:100vh;
+  }
+  a{color:inherit}
+
+  /* ============ 品牌区与目录入口 ============ */
+  .brand{
+    position:absolute;top:2.6rem;left:max(2rem, calc(50vw - 448px));z-index:10;
+    font-weight:700;font-size:1.6rem;letter-spacing:.22em;
+    text-decoration:none;color:var(--ink);
+  }
+  .menu{
+    position:absolute;top:2.4rem;right:3rem;z-index:11;
+    width:4.2rem;height:4.2rem;border-radius:50%;
+    background:#fff;cursor:pointer;
+    display:flex;flex-direction:column;gap:.5rem;
+    align-items:center;justify-content:center;
+    box-shadow:0 2px 14px rgba(28,27,24,.08);
+    transition:transform .25s ease;text-decoration:none;
+  }
+  .menu:hover{transform:scale(1.08)}
+  .menu span{display:block;width:1.5rem;height:2px;background:var(--ink);border-radius:2px}
+
+  /* ============ 有机色块 ============ */
+  .blob{
+    position:absolute;z-index:0;
+    mix-blend-mode:multiply;
+    background-color:var(--c);
+    animation:drift var(--d,14s) ease-in-out var(--dl,0s) infinite alternate;
+    will-change:transform;pointer-events:none;
+  }
+  .blob.dotted{
+    background-image:radial-gradient(var(--dot) 2.1px, transparent 2.5px);
+    background-size:11px 11px;
+  }
+  @keyframes drift{
+    0%  {transform:rotate(var(--r,0deg)) translate(0,0) scale(1)}
+    50% {transform:rotate(calc(var(--r,0deg) + 4deg)) translate(1.2%, -2%) scale(1.04)}
+    100%{transform:rotate(calc(var(--r,0deg) - 3deg)) translate(-1.5%, 1.5%) scale(.97)}
+  }
+
+  /* ============ 标题区 ============ */
+  .page{
+    position:relative;z-index:2;
+    max-width:960px;margin:0 auto;
+    padding:7.5rem 2rem 0;
+  }
+  .crumb{display:inline-flex;align-items:center;gap:.4rem;font-size:.9rem;letter-spacing:.18em;font-weight:700;color:#fff;text-decoration:none;background:var(--ink);padding:.7rem 1.6rem;border-radius:999px;border:2.5px solid var(--ink);box-shadow:5px 5px 0 var(--accent,var(--magenta));transition:transform .25s ease,box-shadow .25s ease,color .2s}
+    .crumb:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--accent,var(--magenta));color:var(--accent,var(--magenta))}
+  .hero-h{margin-top:2.6rem}
+  .label{font-size:.8rem;letter-spacing:.34em;color:var(--muted)}
+  .hero-h h1{
+    font-family:"Playfair Display",serif;
+    font-style:italic;font-weight:600;
+    font-size:clamp(3.4rem,7.5vw,6.2rem);line-height:1.05;
+    margin-top:.6rem;
+  }
+  .hero-h .zh{margin-top:1rem;font-size:1rem;letter-spacing:.2em;color:var(--muted)}
+
+  /* ============ 导语 ============ */
+  .lead{
+    position:relative;z-index:2;
+    max-width:960px;margin:3.5rem auto 0;padding:0 2rem;
+    font-size:1.15rem;line-height:2;color:var(--ink);
+  }
+  .lead em{font-style:normal;background:linear-gradient(transparent 62%, var(--lime) 62%)}
+
+  /* ============ 版块标题 ============ */
+  .sec{
+    position:relative;z-index:2;
+    max-width:960px;margin:5.5rem auto 0;padding:0 2rem;
+  }
+  .sec-h{
+    display:flex;align-items:baseline;gap:1.2rem;
+    border-bottom:3px solid var(--ink);padding-bottom:.9rem;margin-bottom:2.2rem;
+  }
+  .sec-h .no{
+    font-family:"Playfair Display",serif;font-style:italic;font-weight:600;
+    font-size:2rem;color:var(--s,var(--magenta));
+  }
+  .sec-h h2{font-size:1.35rem;font-weight:700;letter-spacing:.12em}
+  .sec-h .en{margin-left:auto;font-size:.78rem;letter-spacing:.3em;color:var(--muted)}
+
+  /* ============ 品牌卡片 ============ */
+  .card{
+    position:relative;z-index:2;
+    background:#fff;border-radius:26px;
+    border-top:8px solid var(--bar,var(--lime));
+    box-shadow:0 6px 26px rgba(28,27,24,.07);
+    padding:2.4rem 2.6rem 2.6rem;margin-bottom:2.6rem;
+  }
+  .card .c-head{display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+  .card .c-head h3{font-size:1.5rem;font-weight:700;letter-spacing:.06em}
+  .card .c-head .en{
+    font-family:"Playfair Display",serif;font-style:italic;font-weight:500;
+    font-size:1.15rem;color:var(--bar,var(--lime));
+  }
+  .card .c-head .tag{
+    margin-left:auto;font-size:.72rem;letter-spacing:.22em;color:var(--muted);
+    border:1px solid rgba(28,27,24,.22);border-radius:999px;padding:.3rem .9rem;
+  }
+  .card ul{list-style:none}
+  .card li{
+    position:relative;padding:.55rem 0 .55rem 1.5rem;
+    font-size:.95rem;line-height:1.75;color:#3d3c37;
+    break-inside:avoid;
+  }
+  .card li::before{
+    content:"";position:absolute;left:.2rem;top:1.15rem;
+    width:.55rem;height:.55rem;border-radius:50%;
+    background:var(--bar,var(--lime));
+  }
+  .card li b{color:var(--ink);font-weight:700}
+  .cols{columns:2;column-gap:3rem}
+  .card .mini-h{
+    font-size:.85rem;font-weight:700;letter-spacing:.2em;color:var(--bar,var(--magenta));
+    margin:1.8rem 0 .4rem;columns:1;column-span:all;
+  }
+  .card li small{display:block;color:var(--muted);font-size:.82rem;line-height:1.6;margin-top:.2rem}
+
+  /* 换机观察 · 引用块 */
+  .observe{
+    column-span:all;
+    margin:1.8rem 0 .6rem;padding:1.6rem 1.8rem;
+    background:var(--paper);border-radius:18px;
+    font-size:.92rem;line-height:1.9;color:#3d3c37;
+  }
+  .observe .o-t{font-weight:700;color:var(--ink);letter-spacing:.15em;margin-bottom:.7rem}
+
+  /* ============ HDD 手册 ============ */
+  .hdd-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:1.8rem;
+  }
+  .hdd{
+    background:#fff;border-radius:22px;
+    border-top:8px solid var(--yellow);
+    box-shadow:0 6px 26px rgba(28,27,24,.07);
+    padding:2rem 2.2rem;
+  }
+  .hdd h3{font-size:1.12rem;font-weight:700;letter-spacing:.06em;display:flex;align-items:center;gap:.7rem}
+  .hdd h3 .ic{font-size:1.4rem}
+  .hdd .warn{
+    margin-top:1rem;padding:.9rem 1.1rem;border-radius:12px;
+    background:rgba(201,49,110,.08);font-size:.9rem;line-height:1.8;color:#3d3c37;
+  }
+  .hdd .safe{
+    margin-top:1rem;padding:.9rem 1.1rem;border-radius:12px;
+    background:rgba(185,217,59,.16);font-size:.9rem;line-height:1.8;color:#3d3c37;
+  }
+  .hdd .warn b,.hdd .safe b{letter-spacing:.12em}
+  .smart{
+    background:#fff;border-radius:22px;border-top:8px solid var(--navy);
+    box-shadow:0 6px 26px rgba(28,27,24,.07);
+    padding:2rem 2.2rem;margin-top:1.8rem;
+    grid-column:1 / -1;
+  }
+  .smart h3{font-size:1.12rem;font-weight:700;letter-spacing:.06em;margin-bottom:1.2rem}
+  .smart{overflow-x:auto}.smart table{min-width:520px;width:100%;border-collapse:collapse;font-size:.88rem}
+  .smart th{
+    background:var(--paper);text-align:left;padding:.8rem 1rem;
+    font-weight:700;letter-spacing:.06em;border-bottom:2px solid var(--ink);
+  }
+  .smart td{padding:.85rem 1rem;border-bottom:1px solid rgba(28,27,24,.12);line-height:1.7;color:#3d3c37;vertical-align:top}
+  .smart td.id{
+    font-family:"Courier New",monospace;font-weight:700;color:var(--magenta);white-space:nowrap;
+  }
+  .smart .zero{font-family:"Courier New",monospace;font-size:.8rem;color:var(--muted)}
+  .smart .final{
+    margin-top:1.4rem;padding:1.1rem 1.3rem;border-radius:14px;
+    background:rgba(201,49,110,.1);font-size:.92rem;line-height:1.85;color:#3d3c37;
+  }
+
+  /* ============ 折腾实验室 ============ */
+  .lab{
+    background:#fff;border-radius:26px;border-top:8px solid var(--magenta);
+    box-shadow:0 6px 26px rgba(28,27,24,.07);
+    padding:2.4rem 2.6rem;margin-bottom:2.6rem;
+  }
+  .lab h3{font-size:1.2rem;font-weight:700;letter-spacing:.06em}
+  .lab p{font-size:.93rem;line-height:1.85;color:#3d3c37;margin-top:.8rem}
+  .cmd{
+    margin-top:1.1rem;background:#1C1B18;color:#E8E6DF;
+    font-family:"Courier New",monospace;font-size:.82rem;line-height:1.7;
+    padding:1.2rem 1.4rem;border-radius:14px;overflow-x:auto;white-space:pre;
+  }
+  .cmd .cm{color:#8b897f}
+  .lab + .lab{margin-top:0}
+
+  /* ============ 感想收尾 ============ */
+  .afterword{
+    position:relative;z-index:2;
+    max-width:960px;margin:5rem auto 0;padding:0 2rem;
+  }
+  .afterword blockquote{
+    background:#fff;border-radius:26px;border-top:8px solid var(--coral);
+    box-shadow:0 6px 26px rgba(28,27,24,.07);
+    padding:2.6rem 2.8rem;font-size:1.08rem;line-height:2.1;color:var(--ink);
+  }
+  .afterword blockquote p+p{margin-top:1.2rem}
+  .afterword .who{
+    margin-top:1.6rem;font-size:.8rem;letter-spacing:.3em;color:var(--muted);
+  }
+
+  /* ============ 回退 / 前进 ============ */
+  .pager{
+    position:relative;z-index:2;
+    max-width:1000px;margin:4rem auto 0;padding:0 2rem;
+    display:flex;justify-content:space-between;gap:1.2rem;flex-wrap:wrap;
+  }
+  .pager a{display:inline-flex;flex-direction:column;gap:.35rem;padding:1.1rem 2.1rem;border-radius:999px;background:var(--ink);border:2.5px solid var(--ink);box-shadow:6px 6px 0 var(--accent,var(--magenta));text-decoration:none;transition:transform .25s ease,box-shadow .25s ease}
+    .pager a:hover{transform:translate(-3px,-3px);box-shadow:10px 10px 0 var(--accent,var(--magenta))}
+    .pager a:hover .pname{color:var(--accent,var(--magenta))}
+    .pager .dir{font-size:.85rem;letter-spacing:.28em;color:rgba(255,255,255,.95);font-weight:700}
+    .pager .pname{font-family:"Playfair Display",serif;font-style:italic;font-weight:600;font-size:1.4rem;color:#fff;transition:color .2s}
+  .pager .next{align-items:flex-end;text-align:right}
+
+  /* ============ 封底 ============ */
+  .outro{
+    position:relative;z-index:2;overflow:hidden;
+    margin-top:5rem;min-height:54vh;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    text-align:center;padding:6rem 2rem 7rem;
+  }
+  .outro>*:not(.blob){position:relative;z-index:1}
+  .outro h2{
+    font-family:"Playfair Display",serif;
+    font-style:italic;font-weight:500;
+    font-size:clamp(2.4rem,4.8vw,3.8rem);line-height:1.15;
+  }
+  .outro .zh{margin-top:1.1rem;font-size:1rem;letter-spacing:.22em;color:var(--muted)}
+  .outro .top{
+    margin-top:2.4rem;width:3.6rem;height:3.6rem;border-radius:50%;
+    background:#fff;display:flex;align-items:center;justify-content:center;
+    text-decoration:none;font-size:1.3rem;color:var(--ink);
+    box-shadow:0 2px 14px rgba(28,27,24,.08);
+    transition:transform .25s ease;
+  }
+  .outro .top:hover{transform:translateY(-6px)}
+  .ob1{--c:var(--lime);--dot:var(--magenta);--r:-10deg;--d:17s;
+      width:30vw;height:24vw;bottom:-14vw;left:-8vw;
+      border-radius:58% 42% 46% 54%/ 52% 58% 42% 48%;}
+  .ob2{--c:var(--yellow);--dot:var(--navy);--r:14deg;--d:15s;
+      width:20vw;height:15vw;bottom:-8vw;left:14vw;
+      border-radius:46% 54% 62% 38%/ 58% 44% 56% 42%;}
+  .ob3{--c:var(--navy);--r:-20deg;--d:14s;
+      width:16vw;height:11vw;bottom:-4vw;right:-4vw;
+      border-radius:64% 36% 48% 52%/ 46% 64% 36% 54%;}
+  .ob4{--c:var(--teal);--r:8deg;--d:18s;
+      width:10vw;height:8vw;bottom:10vw;right:20vw;
+      border-radius:52% 48% 42% 58%/ 60% 42% 58% 40%;}
+  .ob5{--c:var(--coral);--r:-12deg;--d:13s;
+      width:6vw;height:4.5vw;top:6vw;left:18vw;
+      border-radius:56% 44% 52% 48%/ 50% 56% 44% 50%;}
+
+  /* ============ 底部粉色曲线（横向贯穿） ============ */
+  .swoosh{
+    position:relative;z-index:2;overflow:hidden;
+    margin-top:-2rem;line-height:0;pointer-events:none;
+  }
+  .swoosh svg{display:block;width:100%;height:clamp(96px,9.5vw,158px)}
+  .swoosh path{
+    fill:none;stroke-linecap:round;stroke-linejoin:round;
+    vector-effect:non-scaling-stroke;
+  }
+  .sw-line{stroke:var(--pink);stroke-width:clamp(18px,2.3vw,36px)}
+  .sw-thin{stroke:var(--magenta);stroke-width:clamp(3px,.32vw,5px);opacity:.5}
+
+  /* ============ 页脚 ============ */
+  .site-footer{
+    position:relative;z-index:2;
+    padding:2.5rem;text-align:center;
+    color:var(--muted);font-size:.85rem;letter-spacing:.08em;
+  }
+
+  /* ============ 响应式 ============ */
+  @media (max-width:768px){
+    .brand{left:2rem;top:1.6rem}
+    .menu{right:1.4rem;top:1.4rem;width:3.4rem;height:3.4rem}
+    .page{padding-top:6rem}
+    .cols{columns:1}
+    .hdd-grid{grid-template-columns:1fr}
+    .card,.lab{padding:1.8rem 1.5rem}
+    .outro{min-height:44vh}
+  }
+</style>
+<!-- SEO / 分享卡片 / 图标 -->
+<meta name="description" content="Tech 数码笔记——这些年换过、修过、root 过的一堆设备留下的使用笔记，问题清单式。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tech — Simon">
+<meta property="og:description" content="Tech 数码笔记——这些年换过、修过、root 过的一堆设备留下的使用笔记，问题清单式。">
+<meta property="og:url" content="https://routersamba.sh.cn/tech.html">
+<meta property="og:image" content="https://routersamba.sh.cn/og-cover.jpg">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body data-page-node-id="uTUWPQSPiOBF61gCbOZKQu">
+
+<!-- 顶部点缀色块 -->
+<div data-page-node-id="AelvFt3MBH2THirCgy6gzL" class="blob dotted" style="width:17vw;height:14vw;top:-7vw;right:-5vw;border-radius:58% 42% 46% 54%/52% 58% 42% 48%"></div>
+<div data-page-node-id="IelUjuLTvmEO6TQETgi3bv" class="blob" style="width:8vw;height:6vw;top:7vw;right:14vw;border-radius:56% 44% 58% 42%/46% 58% 42% 54%"></div>
+<div data-page-node-id="kTyezZXKbEXqW8HZ58iPnT" class="blob" style="width:10vw;height:7vw;top:70vh;left:-4vw;border-radius:46% 54% 62% 38%/58% 44% 56% 42%"></div>
+
+<a data-page-node-id="FFYBpFj5G9pCrObX4Y1oTY" class="brand" href="index.html">Simon</a>
+<a data-page-node-id="On2Cy8oqCyS1xo7z8zL87b" class="menu" href="menu.html" aria-label="打开目录"><span data-page-node-id="9fg3VczasA8nNou0a2UBQ2"></span><span data-page-node-id="KInlSYGhtpNeibHPfAEEyQ"></span></a>
+
+<main data-page-node-id="PgSHqmvOeNBwE5zAGVZYAt" class="page">
+
+  <!-- 返回上级 -->
+  <a data-page-node-id="7dqy3P5wvub8uyntWaF4Hk" class="crumb" style="--accent:var(--lime)" href="play.html">← PLAY / 兴趣爱好</a>
+
+  <!-- 标题区 -->
+  <div data-page-node-id="itl5YJAch0b3NGJy5NGeDE" class="hero-h">
+    <div data-page-node-id="HDfNckVoRtVyvyeBBnpGc4" class="label">NO. 03 — 之四</div>
+    <h1 data-page-node-id="vtka85FZYv59D9IYzgZOGW">Tech</h1>
+    <div data-page-node-id="Mkh6vnlW5q5RhpsPIWCwk5" class="zh">每个系统的脾气，都得亲手折腾过才知道。</div>
+  </div>
+
+</main>
+
+<!-- 导语 -->
+<p data-page-node-id="yMgLxsbcF57f94ZjqPm40s" class="lead">
+  iPhone 只在<em data-page-node-id="UCl3RuQFXRMH1hwzkoNAxf">没有实际使用时</em>具有强吸引力，一旦上手就会被它的各种限制膈应。下面是这些年换过、修过、root 过的一堆设备留下的使用笔记——问题清单式，脾气秉格式。
+</p>
+
+<!-- ============ 01 品牌吐槽 ============ -->
+<section data-page-node-id="MNtIbXX2rYh9ORrNmKAMVc" class="sec">
+  <div data-page-node-id="IdC6WgoWa0HzTdFv5ipe6p" class="sec-h">
+    <span data-page-node-id="yVftnuFca989aKpA9WEWBB" class="no">01</span>
+    <h2 data-page-node-id="PEDV9ZC3XpUzM9UeDZ54Ns">各家的脾气</h2>
+    <span data-page-node-id="Q6agYLiYWRu7O08qegGPky" class="en">DEVICE NOTES</span>
+  </div>
+
+  <!-- iPhone -->
+  <article data-page-node-id="2mFzhyNoZHNvW9kszO5RXs" class="card">
+    <div data-page-node-id="DtTN1UuNqLZwsakQ5yzgrR" class="c-head">
+      <h3 data-page-node-id="NhwvZGJdF7cPkSRlv6Jd4d">iPhone</h3><span data-page-node-id="1RSdrpwQBOHGw7pTOywJPC" class="en">iOS</span>
+      <span data-page-node-id="XruoMEXJ6EyyNpJltnhXdA" class="tag">封闭性样本</span>
+    </div>
+    <ul data-page-node-id="epdFgBfkwMStrb21vejwAb" class="cols">
+      <li data-page-node-id="rCIVgdhubF0vGuxXjwsCZ5">每七天需要刷新一次测载软件</li>
+      <li data-page-node-id="eRsFuvZ9FsNcajQ5gNfSsD">浏览器均为 WebKit，没有真正的 Tor 浏览器。Onion Browser 有 WebRTC 泄漏真实 IP 的问题</li>
+      <li data-page-node-id="r8CKpNWRPNGdlLDQN1AlVW">获取应用不自由，只能在 App Store 里找</li>
+      <li data-page-node-id="HNR1z0MxokT9AEEWPdyoj8">苹果硬件每代独占新功能，计划报废旧设备</li>
+      <li data-page-node-id="QM9gJBkYPlmmFCQimDQX9r">部分基础设施应用需付费购买或订阅</li>
+      <li data-page-node-id="skJxpeR4aA5iP2CYWrXN6N">IM 聊天软件的内容形态受限（Telegram 可以在网页端解除限制，Discord 的客户端锁死不允许看 NSFW 群组）</li>
+      <li data-page-node-id="BoYyEwMH9bBeHDxHTCgiG8">USB 共享网络需要目标电脑安装 iTunes</li>
+      <li data-page-node-id="hIBejwARAXzwg0CmGXByEE">最右边有一个无法关闭的应用程式一览</li>
+      <li data-page-node-id="qtl9NQ4pM5tLHPUtEx4x4i">隐藏应用不彻底，在部分记录（电池使用）中仍然可以看到被隐藏的应用的名字</li>
+      <li data-page-node-id="Xajb29B6E4qzqlHzeSl9px">被隐藏的应用退出就不会保留后台，每次进入应用都需要进行一次人脸识别</li>
+      <li data-page-node-id="0HGtyyuf6JRaWWFXGzQT3k">iCloud 默认开启，下载支持 iCloud 存储的应用后会默认开启 iCloud 存储</li>
+      <li data-page-node-id="IQJIkbFNvBHlYMkvzRXVWl">内购只能用商店所属地银行卡付款</li>
+      <li data-page-node-id="pJPMoFuHgxt2bcmkiuH3AO">礼品卡余额可能要求先绑定银行卡</li>
+      <li data-page-node-id="d6cR0TVmgqL1sHQoCI3e8H">Apple 账号如果开了 Find My 然后又被封号的话，会导致设备被锁定无法退出</li>
+      <li data-page-node-id="QfUSlZktYPtCOZDtmywm0n">充值只能买礼品卡</li>
+      <li data-page-node-id="NhSB6Hj32x2Ff9PZm1fxCR">Apple 账号的跨区使用严格来讲是违反使用协议的</li>
+      <li data-page-node-id="xAtBpvRCH2zyylSV0yKgOn">无法根据应用程序分流，不能一边听 YouTube Music 一边看知乎</li>
+      <li data-page-node-id="UkAbqZRxlRNaJ0yw0YfrSW">无法和电脑版 Firefox 同步书签</li>
+      <li data-page-node-id="p9QkVDnELgOLt2AipXwW5K">Reddit 现在强制要求手机浏览器不得观看 NSFW 内容，必须下载客户端，但 Android 的 Firefox 有插件可以绕过这个限制</li>
+      <li data-page-node-id="WQeiDsgyUoJU4FT8Jtwgf6">没有 Muzei 和 Pixiv for Muzei3 可以自动更换并下载壁纸</li>
+      <li data-page-node-id="lk55DdkIYWn4qUs9X5gezn">通过微软照片导入的照片会导致原图片和叠加层分离，比如一张 HEIC 后面跟一个同名的 AAE</li>
+    </ul>
+  </article>
+
+  <!-- Pixel -->
+  <article data-page-node-id="uCERX1tKvRyiKT02KKZNTY" class="card">
+    <div data-page-node-id="oXRuPnRMmcuI9ZEtTQ7Jvr" class="c-head">
+      <h3 data-page-node-id="H21aWK15ooSeW08lY115kR">Pixel</h3><span data-page-node-id="XRhpvS5tiLZRRmoNBLzYEI" class="en">Android 原生</span>
+      <span data-page-node-id="YBxHGngsiUeJ5GoHiYfQVA" class="tag">理想主义者</span>
+    </div>
+    <ul data-page-node-id="WlaHEWXIWEEwcdGAqrW0EA">
+      <li data-page-node-id="NuNxCoA5ZCWyefz9matbbW">状态栏图标需要应用特别适配，没适配就是一个圆形，很难看（AOSP 系列通病）</li>
+      <li data-page-node-id="zEOiCxo5q8p8WBW5fsgUkP">芯片性能严重落后骁龙</li>
+      <li data-page-node-id="dSczJRIeprGiOgEY5bmhSV">游戏中心只有屏幕截图快捷方式、屏幕录制快捷方式、FPS 计数器、免打扰快捷方式，以及一直「不适用此游戏」的优化模式、成就——排行榜以及 YouTube 直播，没了，费拉了一点</li>
+      <li data-page-node-id="yW2QJQiWiC7EVr8ZMDzfo9">所有 AOSP 类系统的滚动截图都需要应用特别适配，不像三星、一加系统自带的长截图一样直接暴力截图</li>
+      <li data-page-node-id="W7H0OTqkEe0dw97EEOp8b7">VoLTE / VoWiFi / 5G 等通讯功能受谷歌运营商白名单的影响，在不受支持的国家不可用</li>
+      <li data-page-node-id="d9ibiJrb6w0EKnrvYZEgYK">主用户和多用户安装同一个应用，该应用可能会在其中一个用户中无法正常工作——Chrome、Muzei、Syncthing Fork、v2rayNG 都中过招（这是所有 Android 的通病）</li>
+      <li data-page-node-id="qelIQtF4Rr9bmlH5rVU1D9">多用户会降低整体性能</li>
+      <li data-page-node-id="fnaxCaDEeBfMQ1j0GJ9U1k">谷歌在限制 hook 行为：audio policy 变成 AIDL 接口、Iconify……</li>
+      <li data-page-node-id="AaBasAOxRliT8TXGfxK1Pe">Android 过去用 XML 构建 UI，Android 15 起过渡到 Jetpack Compose，16（QPR）开始 UI 完全由 Compose 构建。与 XML 不同，Compose 更难修改或挂载——代码在构建时内联并大量优化，难以追踪或更改；加上 Compose 不断重绘 UI，可靠挂载非常困难。因此我们无限期归档此项目，直到找到更好的方案<small data-page-node-id="M3ZmBlpq9GCDLDSG2QnnzE">——某 hook 项目作者的停更声明， Pixels 生态的缩影</small></li>
+      <li data-page-node-id="lmWYoZu7GrP6gR4jaDFMTo">难以绕过的 Strong Play Integrity</li>
+    </ul>
+  </article>
+
+  <!-- 索尼 -->
+  <article data-page-node-id="xEDOXoSj2vnn1j75XlbVCS" class="card">
+    <div data-page-node-id="rf1n3gWAfamooGZeJnC2WB" class="c-head">
+      <h3 data-page-node-id="iBqchvHwow3jXJfFC5on7N">索尼 Xperia</h3><span data-page-node-id="T7NbmEma7RfY2dZ8XHdqbO" class="en">Sony</span>
+      <span data-page-node-id="8DllfrWuB9iHFzsditiacI" class="tag">颜值欠费</span>
+    </div>
+    <ul data-page-node-id="8b7An9nKO6nngIYGGBlhB1" class="cols">
+      <li data-page-node-id="CcxTlkV53TFhVZaGA9E7Ie">Xperia 全系列的 SD 卡读写速度上限是 50MB/s</li>
+      <li data-page-node-id="YTC2QY4B544ZWw7ADf5Wds">没有系统自带的双击唤醒和双击睡眠</li>
+      <li data-page-node-id="2RA3B3OsQEeVvfgnXUEAHj">没有彩色通知图标（AOSP 通病）</li>
+      <li data-page-node-id="nzYRVCDDbGxrSUIxctOGsC">没有自带的滚动截图（AOSP 通病）</li>
+      <li data-page-node-id="UGDOlHu8TcAgllE7lqXS60">系统不如三星或一加手机美观，天差地别——光靠 root 后可用的社区美化模块根本救不回来</li>
+      <li data-page-node-id="FWSrAGotEQoME0GhiPZbNN">控制中心下拉后固定是不可更改的一片纯黑色</li>
+      <li data-page-node-id="dIN6uJMyZsjA9fVj02AjPt">时钟样式只有两种，而且都不美观</li>
+      <li data-page-node-id="0r4587VF2YTqEQA0hx1bUw">状态栏图标遵循了 Android 传统，不如 Pixel 那种美化过的好看</li>
+      <li data-page-node-id="Tx7fjlBGCDfT6P6NB8ZCdS">主屏幕-系统颜色-其他颜色中的可用色只有固定的两个，Pixel 有十个出头</li>
+      <li data-page-node-id="i3J0KM9kjfZPWyTgyuxiXc">设置页面的图标不像 Pixel 一样受 Material You 控制（变色、功能性图标外围绕一圈圆再上色），永远是单色——LineageOS 家族那种单调的系统也是这样</li>
+      <li data-page-node-id="6SADN5OAMEeruMP2X2iR6g">fastboot 找驱动麻烦（newflasher 会提供）</li>
+      <li data-page-node-id="f3phqZE1L3naFXpzrcoa3m">Xperia Companion 找驱动也很麻烦（在安装文件内藏着）</li>
+    </ul>
+  </article>
+
+  <!-- 三星 -->
+  <article data-page-node-id="usBUDto26B92bD2oHAd6la" class="card">
+    <div data-page-node-id="D9AsGbhtXqMfnHQPDY1Fko" class="c-head">
+      <h3 data-page-node-id="DUAwJQBlFAz3aoanLqssrU">三星</h3><span data-page-node-id="ypMn994mNJQKBtxas2dFC4" class="en">One UI</span>
+      <span data-page-node-id="jkq6dCtslFmiGYAPZFr8Ah" class="tag">区域限定狂魔</span>
+    </div>
+    <ul data-page-node-id="dtsFx6e2OyibchRUZwHFJ8" class="cols">
+      <li data-page-node-id="UME2vLyF8kKN5JTl9JQrXv">多语言支持不够：Good Lock 和 Good Guardians 没有繁体中文，Bixby 也没有</li>
+      <li data-page-node-id="2fv22BgQ88FGO5HnYSdOBl">相机拍出来不够自然，看起来像是被刻意美化过</li>
+      <li data-page-node-id="RT7JSZR2DQePdvpqp4HD2v">三星账户强制绑定手机号码</li>
+      <li data-page-node-id="YeyTe8u4oLWW5RDGV44vOK">不论哪个国家的固件都自带一个杀毒软件，比如 McAfee</li>
+      <li data-page-node-id="ZiijUzdG4KQ0jW5D5JfY2Z">部分第一方软件有区域限制（三星商店靠 SIM 卡的国别码识别），想换区必须拔卡</li>
+      <li data-page-node-id="i5wy4R3YMl7GhkHGz7gYI7">陆港台版本的三星键盘简体中文强制自带搜狗词库，且无法更改为其他版本硬件上的三星键盘（美版硬件的三星键盘没有这个问题）</li>
+      <li data-page-node-id="ifRPt4HXoadnhImcQY9J0r">三星钱包根据固件和 CSC 严格限制区域，无法通用</li>
+      <li data-page-node-id="tyw68CYUjdEkocPLBfYeGG">非国行系统的三星健康使用谷歌地图</li>
+      <li data-page-node-id="ZU7tSGzRD7tn3Dru7UhO29">某些功能特定于固件：Blockchain 仅在 N 和 B 后缀的三星手机中提供</li>
+      <li data-page-node-id="B81stwhCSqO7094Vf5p6CN">检测到中国 SIM 卡会问你是否使用本地电池策略；插中国 SIM 卡无法注册其他国家的三星账号、无法使用视频通话流转</li>
+      <li data-page-node-id="3khBxXM3YIqEpySpG97wfj">增强的数据保护（三星云 E2EE）国行没有，港台有；Samsung Pass 国行也没有</li>
+      <li data-page-node-id="oNKfYi71gOCRVmZG3G3S13">反取证工具因三星手机没有多用户导致 profile deletion 不生效（Shizuku+Dhizuku+无障碍权限没有能力删除安全文件夹）</li>
+      <li data-page-node-id="hFlxOM9sc9JGrwwVu36Ue8">Amarok 的拨号盘呼起不生效，索尼手机生效</li>
+      <li data-page-node-id="n63YjQGAQPSwuc7iV8qFgA">Shizuku 后台运行时间长了会被杀后台</li>
+      <li data-page-node-id="sFuGrCj2BqCi3B88PU6qBY">屏幕壁纸不会随着页面滚动（索尼、Pixel 可以）</li>
+      <li data-page-node-id="TqbUFWcwFj6E0bWOAROlfL">各固件版本与 CSC 的差别实在太大，不通用</li>
+    </ul>
+
+    <div data-page-node-id="sp4PNYB1xVMv0M42p6FfE7" class="observe">
+      <div data-page-node-id="npWWzQlOhuo45EszNnlf9K" class="o-t">▍换机观察 · 从旧三星换到 S23 的有感区别</div>
+      <p data-page-node-id="x6RXAH2flHkankEh1iXu1q">国区 Bixby 锁区了：以前非国行系统也可以用中国 Bixby，现在港版系统 Bixby 地区选不了中国，中文 Bixby 基本废了。Google 方面，国行会切断 Google 套件和服务器的后台同步，安卓消息推送基本收不到；也无法语音唤醒 Google 助理、无法将 Google 设为默认助理，意味着用不了 Google Lens 做当前界面识别。国行的系统安全插件由腾讯手机管家提供，且有定制的 APK 安装器——你安装的 APK 信息和 App 列表都会传给腾讯，这就看你介不介意了。AI 的差异：国行识屏 AI 是百度和京东，图片 AI 是美图秀秀，文字生成 AI 是 WPS。国行刷港版系统和直接买港版基本没有差别，唯一差异是系统信息里的设备硬件编码是国行硬件 CHC。</p>
+    </div>
+
+    <div data-page-node-id="nFdXQrQ6zSB6umsi94bnRX" class="mini-h">系统功能方面</div>
+    <ul data-page-node-id="2XdpQKwLVFi93A7A7rRPBQ">
+      <li data-page-node-id="BOuEGyPImjFIyJBeB7AWK1">国际版预装 App 多：完整的 Google 全家桶、微软全家桶以及 FB，基本都无法卸载。据报道国际版 S23U 系统占用达到 60G，大部分为内置 App；国行非必要的 App 都可以卸载</li>
+      <li data-page-node-id="x4AbrGmW2ZHueeFuDj3M7p">负一屏国行和其他国产手机差不多；海外系统为 Samsung Free 或 Google 探索，可自行设置</li>
+      <li data-page-node-id="v9yrjpisDaSRrFFYkDLvIf">国行安装 App 有专供安装器（带推荐应用推广和应用黑名单）；国际版装 APK 会过 Play 商店验证，速度没有国行快</li>
+      <li data-page-node-id="QfWYGxK2EfLKQvhKaLhtNd">国行过度动画日常掉帧；国行浏览器为三星浏览器且主页带资讯页，港版为 Chrome</li>
+      <li data-page-node-id="vDhyZObS04Cku3CNpZHAQl">国际版应用商店会根据 SIM 卡属地切换地区，国行锁国区商店；国行通话界面有黄页，国际版没有</li>
+      <li data-page-node-id="LEmzgi2Gf39BpcrPUKLH9Q">国际版文件 App 可以连接 OneDrive 和 Google Drive；国行有红包助手（红包提醒）</li>
+    </ul>
+
+    <div data-page-node-id="NubyRf2G13oQP1yXtNC9Jd" class="mini-h">三星服务方面</div>
+    <ul data-page-node-id="6Gxo51VNf0LfBBUsD0Day7">
+      <li data-page-node-id="fIpD9SCXbchBD7RPaqbLYc">国内版账号和国际版不互通：用非国区 ID 的话，健康数据、云储存都无法同步</li>
+      <li data-page-node-id="qGX2UXdDLN3OWmIAextBbf">Samsung Pay 地区跟随系统版本，非国行系统无法绑定银联卡、公交卡及其他 NFC 凭证</li>
+      <li data-page-node-id="HHQ1vdiVwQP1yW2nozcH2j">国行有专用 App：生活助手（优惠券、动车票行程提醒）、智能管理器（清理储存、应用锁、自启控制）</li>
+      <li data-page-node-id="ez6xU0ZEiJAwE1s35q7qSa">国际版三星音乐由 Spotify 提供；Bixby 基本互通，但海外版无法用 Bixby 控制微信（国行可以）</li>
+      <li data-page-node-id="thlrJ8zeJAEQSE4HF0pVNK">识屏服务国行主要是百度，国际版识图是 Pinterest、翻译是谷歌翻译</li>
+    </ul>
+
+    <div data-page-node-id="dA7Dwq1L6K2zDNKb61TceO" class="mini-h">安卓原生功能 / 消息推送 / 协同</div>
+    <ul data-page-node-id="qWd0mWzgv2SA3RsgyDV4nW">
+      <li data-page-node-id="pxR8AtWJette28lcD98qtl">国际版除 Bixby 外还有谷歌助理；国行可以自行安装谷歌助理但无法用 Hey Google 唤醒，也无法后台同步 Google 账号数据（Google 相册只能打开 App 同步）</li>
+      <li data-page-node-id="0zjdC7yQdktP5dhkTxWiAO">国际版文件分享用安卓分享，国行用互传联盟；投屏国际版是 Chromecast 协议，在 Google TV/Nest hub 上播放会自动弹出媒体控制器，国行不会</li>
+      <li data-page-node-id="6fRXUo4ppuqMF3Hc23xn4s">国行喜欢杀后台，很多非国内 App 打开时才收到消息；国际版插国内卡开启本地服务后同样杀后台——又没有国行推送服务，结果国内外 App 都收不到消息，达成「与世隔绝」成就</li>
+      <li data-page-node-id="BeYZwo7iZDm5HiKao7aHzr">微信在两个版本里都是保活的</li>
+      <li data-page-node-id="pEKuP2wQYkndobHGhE0foo">国际版可与微软账号协同：笔记同步 OneNote、相册同步 OneDrive、提醒同步微软 ToDo、剪切板与 Windows 同步、系统内置微软手机助手</li>
+    </ul>
+  </article>
+
+  <!-- 一加 -->
+  <article data-page-node-id="mUprlUDbtTwHpi2qFIL4PT" class="card">
+    <div data-page-node-id="pZl0jHA2xvG6vxP9kKAake" class="c-head">
+      <h3 data-page-node-id="EG6DHk0yBCyqpdJ3hG0Aum">一加 / OPPO</h3><span data-page-node-id="5dO5psUKpqCYqoCpogAqD2" class="en">OxygenOS · ColorOS</span>
+      <span data-page-node-id="3xSdkdXUugXDiZveT4CNuF" class="tag">刷机困难户</span>
+    </div>
+    <ul data-page-node-id="ywBxLKDV0TDsZTjgEzeEQ2" class="cols">
+      <li data-page-node-id="n25W53eAyN16fNQYyXHJgL">电话卡区域锁定：中国版手机带到国外用会被禁止通讯功能</li>
+      <li data-page-node-id="i49crG9MHcM1yOsFONvZeT">ColorOS 两大问题：自带的浏览器无法通过 adb 权限或设备所有者权限删除；修改设备名称必须联网校验、无法绕过</li>
+      <li data-page-node-id="Fsb7o6CCEwmIUbwfFAckxO">中国版固件刷外国版固件会损失一些功能，不过一般 root 可解决——比如一加 13 的信号、一加平板 2 Pro 的手写笔（系统白名单）</li>
+      <li data-page-node-id="kx2FqhxxTwtRfKDuzppgHD">OxygenOS 也包含了很多 ColorOS 的组件；OPPO 和 OnePlus 的代码库已经统一</li>
+      <li data-page-node-id="LKSsBCZjSBZfD3fBrHAwC6">OxygenOS 无法为 Firefox 使用硬件视频解码</li>
+      <li data-page-node-id="mPVCoyIbzFf9f3Ex9AU1ui">刷氧 OS 回锁会无法 OTA，一旦 OTA 就不开机——一加 13 在 dtbo 上做了手脚，干扰国行刷氧 OS</li>
+      <li data-page-node-id="lFRTedhiQ0viX5Z8VrVpzx">9008 锁定，只有 OPPO 售后有权限操作 9008</li>
+      <li data-page-node-id="QHti0lnDGtTh2tiDQHGBTg">OxygenOS 中台湾不叫台湾，而是叫台北</li>
+      <li data-page-node-id="72mBSsYGUrz3XIHkeNNIVL">开发者选项里有个「禁止权限监控」按钮，不开启会阻止 Shizuku 正常工作</li>
+      <li data-page-node-id="ygxQNLFcUMeDerTjip5Xx4">有 OTG 连接选项：不开则外置 USB 存储设备无法使用；不能常开，10 分钟无设备自动关闭</li>
+      <li data-page-node-id="aWPPoPcbVdMGmlsvvwmaJH">OxygenOS 手机版有手机管家；平板的工作列固定有设置软件，不可更改位置或移除</li>
+      <li data-page-node-id="Moe2f1AkQUv5uAQoQaFTeQ">13 英寸平板不适合玩游戏，划视角操作受限；横版和竖版会影响桌面壁纸的可见度（比例会变）</li>
+      <li data-page-node-id="VsDx2VDXIe3rMRsfXzzMmj">阅读 PDF 电子书始终是一项艰难的工作，不管用平板、电脑还是手机</li>
+      <li data-page-node-id="BH6j1kHxmaFcts2KoYi66B">一加 Pad 2 Pro 的原厂音频解析度还可以，但分离度不行，声音混在一起；默认音频质量不好，需要模块补救</li>
+      <li data-page-node-id="nQbb0ueeJINDGs51VgVqj4">OxygenOS 无法使用 duress、无法正常工作；也无法使用 NFC Card Emulator Pro</li>
+      <li data-page-node-id="4IcwQrJrgFPgh54jleCCuu">多用户没有「VPN 始终开启」和「封锁非 VPN 流量」的功能</li>
+      <li data-page-node-id="vzDBmtTaLwquIAD7XaJcOW">相册的编辑功能会将图片送给深圳万普拉斯处理；如果删除谷歌相册，一加相册会一直提醒你谷歌相册已被删除、备份不可用</li>
+      <li data-page-node-id="x1wnNxu4GsDUjQl15HNuAg">Android 系统会持久通知 VPN 已开启；v2rayNG 如果在开启后立刻被划掉后台，就会自己关闭</li>
+      <li data-page-node-id="CH2ouFSdplzOFoOiT57wcq">有锁屏密码的情况下禁用应用需要输入锁屏密码；后台锁定最大只允许五个</li>
+      <li data-page-node-id="f3e2bBu2GST0egA2DuwAaM">反复更新以及 COS 和 OOS 之间日益扩大的差异，最终导致需要禁用 vbmeta 才能启动；分析 odm.img 时还注意到音频、充电、摄像头、显示、蓝牙和 Wi-Fi 配置的细微差异——好在实际使用未造成显著问题<small data-page-node-id="zchXUcbFuYKOuwDT4ED6CB">——来源：XDA Forums · Magisk Module「Stylus Fix for OnePlus on Different Regional ROM」</small></li>
+    </ul>
+  </article>
+</section>
+
+<!-- ============ 02 HDD 守护手册 ============ -->
+<section data-page-node-id="UABSMEhZWXhAPGneZGUOP6" class="sec">
+  <div data-page-node-id="8pCGKRDyGRIt32bgCAs6fz" class="sec-h">
+    <span data-page-node-id="b9ks6BzPiKsleSVQANrufn" class="no">02</span>
+    <h2 data-page-node-id="xXO7Amt73JjYCJOnfxhtgG">机械硬盘守护手册</h2>
+    <span data-page-node-id="mHDWAYz1tB9JNOh3bxu6os" class="en">HDD SURVIVAL GUIDE</span>
+  </div>
+
+  <p data-page-node-id="YeBCFlvH79IGkJdShn8FvB" class="lead" style="margin:0 auto 2.2rem;padding:0;font-size:1.02rem">
+    机械硬盘本质上是一台超高精度的物理微型机械——全速运转时盘片转速相当于直升机螺旋桨的十几倍，磁头与盘片的距离只有几纳米（人类头发丝的万分之一）。以下规范用于保护素材、工程文件和核心数据。
+  </p>
+
+  <div data-page-node-id="ctKQbImquqGF566ANbljqk" class="hdd-grid">
+    <div data-page-node-id="QfAii4g0FnR4xbSO4BiGZ9" class="hdd">
+      <h3 data-page-node-id="aTTpVVJe0gwpPDSFNKe9rr"><span data-page-node-id="1AF2H7fg1vVAILLtkXQbRj" class="ic">🛠️</span>一 · 日常摆放与运行禁区</h3>
+      <div data-page-node-id="oVri3n011eFuKiwslUeWE1" class="warn"><b data-page-node-id="XnwNqDH4Fn7BbB7C0YIeZy">核心禁区：</b>通电读写（传文件、渲染导片、读游戏）时，绝对不能移动、翻转、磕碰或摇晃硬盘盒/机箱——任何轻微位移都会让磁头直接「坠机」划伤高速盘片，造成永久性物理坏道和数据全灭。键盘大力敲、桌子不稳、宠物跳上桌都是隐患。</div>
+      <div data-page-node-id="lnHWLf5yHbSQktRHNUUE0m" class="warn"><b data-page-node-id="7S7Wv2EX6ZgzAG8zLSmlEh">远离大功率 HIFI 音箱：</b>严禁贴着音箱摆放或放在两台大功率音箱正中间。低音共振会导致磁头寻道错误、速度暴降甚至划盘；强力磁钢会逐渐磁化盘片，发生「文件无故损坏、CRC 校验错误」的内伤。</div>
+      <div data-page-node-id="rQsvVpDL83tN2nKFCio6L4" class="safe"><b data-page-node-id="5rJ1SPgGfgdmiP1HK053bv">安全动作：</b>放在稳固平整的水平面；硬盘距离音箱 50 厘米以上，受限时音箱下垫避震海绵，硬盘与音箱之间用铁/钢制结构件做物理磁屏蔽。</div>
+    </div>
+
+    <div data-page-node-id="uwySrzq5EFr7ACop1SnvkZ" class="hdd">
+      <h3 data-page-node-id="MXmniXwLHtXUEH3WKCzuGI"><span data-page-node-id="QOYHSC63HRzSvAuJTVTfh5" class="ic">🔌</span>二 · 供电与接口安全</h3>
+      <div data-page-node-id="bekYYMGd60uDSqeXnBSBGf" class="warn"><b data-page-node-id="t72dyZvRxOPGoOpehg2Cxq">先安全弹出再断电：</b>严禁在硬盘正在读写、或刚传完还没等几秒时直接拔 USB 线/关电源。突然断电会让磁头来不及复位，直接「拍」在盘片上；还极易破坏文件系统路由表（MFT），整块盘变 RAW。</div>
+      <div data-page-node-id="JcB4k6ztQdFHagPByCVmkX" class="warn"><b data-page-node-id="DT8ej2aAHnAJNW9zdBxcby">拒绝供电不足的接口：</b>3.5 寸大机械必须用带独立 12V 外接供电的硬盘盒，严禁劣质无牌供电线；2.5 寸移动硬盘严禁插机箱前置 USB 或无独立供电的廉价 Hub——电压瞬间下掉会导致频繁磁头复位、中途掉盘，烧电路板或出坏道。</div>
+      <div data-page-node-id="ZEYPycZVjCqe9YeAD8l8vn" class="safe"><b data-page-node-id="w3SsQi0ILPju3EAayYL3qm">安全动作：</b>关机前在任务栏点「安全删除硬件并弹出媒体」，看到提示再断电；移动硬盘插主机背面主板原生的 USB 3.0/3.1（蓝色、红色或 Type-C）接口，确保 5V 供电足额。</div>
+    </div>
+
+    <div data-page-node-id="mAODrCstAQAYBcHaQtR88K" class="hdd">
+      <h3 data-page-node-id="88rMu8JGPdAa4u2CPkjG1v"><span data-page-node-id="wHgqHbcqgV1YrkVLjM1Rei" class="ic">🌡️</span>三 · 环境与维护管理</h3>
+      <div data-page-node-id="m2vPyxAT2k4E928usi0iZC" class="warn"><b data-page-node-id="OAUNhxzkDkmzbAZ7qeQo9U">警惕 50°C 以上持续高温：</b>严禁放在密闭「闷罐」外壳内或机箱出风口附近。长期 50–60°C 会让主轴轴承润滑油脂加速挥发干涸——机械磨损加剧、噪音变大、寿命折半。</div>
+      <div data-page-node-id="IG27fGEfqTDL5fOZnr1yQN" class="warn"><b data-page-node-id="kEBDhp9K8n3rgNbEOb2tUe">防静电与科学冷备份：</b>裸盘手拿时严禁触摸背面绿色电路板（PCB）和金手指，人体静电可能瞬间击穿主控芯片。</div>
+      <div data-page-node-id="bAKeoT6wlqnQo01cEkjmlE" class="safe"><b data-page-node-id="Blo9lCS44eHlWHsMb1bQYb">安全动作：</b>用 CrystalDiskInfo 观察温度，控制在 45°C 以下；批量倒大文件时卸掉闷罐盖子「物理开颅」散热，或用小风扇对准吹。拿裸盘握两侧金属边缘。推荐「用完即关/拔」的冷备份——只要不通电，硬盘对震动、高温甚至磁场的耐受度提升几十倍，磁头零磨损，寿命无限延长。</div>
+    </div>
+
+    <div data-page-node-id="xsUd5SUNDCkHS9chel4G79" class="smart">
+      <h3 data-page-node-id="8rtBNqklAbg2bZEJlmNSjJ">📊 四 · 健康自我体检（每 2–3 个月一次）</h3>
+      <table data-page-node-id="0qcGqflMX2xn9I66wB8BeJ">
+        <tbody><tr data-page-node-id="UuWl5xGAoGfO0OPloMLbRY"><th data-page-node-id="GDiSoGPXqwIHa6WM2UE35G">关键 ID</th><th data-page-node-id="1DKig6CaTX6h09rhStqUQo">S.M.A.R.T. 属性</th><th data-page-node-id="QQOSGW5WVL3j9Tmw0WuWbM">正常状态</th><th data-page-node-id="rT9k360nL4HLXKeQJHniFf">异常危险信号</th></tr>
+        <tr data-page-node-id="RdLnRXEFp1ozVSwicDQ3o7">
+          <td data-page-node-id="3ALYV16x7ZTabgAPOi52OZ" class="id">05</td>
+          <td data-page-node-id="8GeCZuzt7A9jLi7YdzH31H">重新分配扇区数<br data-page-node-id="vOkDy4wZV9yiFZzhJkemm3"><span data-page-node-id="McXNAcn8RGrWZxRXToRU9o" class="small" style="color:var(--muted)">Reallocated Sectors Count</span></td>
+          <td data-page-node-id="cSpDE4bOBMBmVEBljBs935"><span data-page-node-id="XcHVXgZ1KVUp68vZeRX3PG" class="zero">000000000000</span></td>
+          <td data-page-node-id="u8KuGW4JeSBf4oBmybkaV7">只要不为 0：说明有物理坏道已被屏蔽，盘片开始损坏。</td>
+        </tr>
+        <tr data-page-node-id="AQMiUXjoeuSUOGiGaSGBJQ">
+          <td data-page-node-id="jo0kO9bpCtbnuBAAosptRC" class="id">C5</td>
+          <td data-page-node-id="CyWaBBDJDixyNbBVq9uu0Y">有待处理扇区数<br data-page-node-id="FUnlatrgQFJD0YxpJmc2om"><span data-page-node-id="2wbEgbEkAHSqlufKVuxg9v" class="small" style="color:var(--muted)">Current Pending Sector Count</span></td>
+          <td data-page-node-id="pJMxyTM1iLpiy2diHV3zsr"><span data-page-node-id="Z0emJrOzMWi1FDf8V8yTQ6" class="zero">000000000000</span></td>
+          <td data-page-node-id="oyIqXCCOKFQ8DziH3toAbk">只要不为 0：说明有疑似坏道正在等系统校验，极易卡顿、死机。</td>
+        </tr>
+        <tr data-page-node-id="rpxOaOkoSrCFaakmMDW2fO">
+          <td data-page-node-id="KWwoS4YsbD5ZVrUFP4aFRE" class="id">C6</td>
+          <td data-page-node-id="HcT38YE0SnlHGg3qQPlTSp">不可校正的扇区数<br data-page-node-id="fizNohzPChEbz0fSd7BjfZ"><span data-page-node-id="mX8xpBzdi1j6STGiuTcdKU" class="small" style="color:var(--muted)">Uncorrectable Sector Count</span></td>
+          <td data-page-node-id="uBcJ5DxgxPAKOXtlNvReN4"><span data-page-node-id="7zFV1xJYtT5pesgMNsNmgU" class="zero">000000000000</span></td>
+          <td data-page-node-id="HDwiAHpQTL46iXwJgGrvqM">只要不为 0：严重的物理坏道，数据已经开始丢失，磁头寿命将尽。</td>
+        </tr>
+      </tbody></table>
+      <div data-page-node-id="HoYfWzSS3Td1S8JwEZJ4J9" class="final">🚨 <b data-page-node-id="q2uOl5WQ3sAlnvoU8P5xwy">终极警告：</b>任何机械硬盘都存在突然暴毙的概率。05、C5、C6 一旦亮黄色警告，请立刻停止写入任何新数据，并全速将内部核心数据备份到 SSD 或其他安全介质中。<b data-page-node-id="OJuuynLYgSNbg1XN1i8eAZ">数据无价，谨慎操作！</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 折腾实验室 ============ -->
+<section data-page-node-id="2fwBmlBjW9bhpZ9DfcMXvU" class="sec">
+  <div data-page-node-id="MXpw43p9KRAxBW5FSE9aGe" class="sec-h">
+    <span data-page-node-id="EzaGLyMSmS71hfE2i1GAlx" class="no">03</span>
+    <h2 data-page-node-id="C7iJ0MwhXGBsPCH3W5P7Li">折腾实验室</h2>
+    <span data-page-node-id="amT4Rq71mzVBhqHrKD5A0l" class="en">TINKER LAB</span>
+  </div>
+
+  <article data-page-node-id="LfvFblBDgzMB5gfWzQe0QO" class="lab">
+    <h3 data-page-node-id="r5NgoWMwRD7iy5PnufQPQR">绕过三星健康监测的地区限制（Shizuku + JumpReplay）</h3>
+    <p data-page-node-id="tz3DmbIjzdB4DWVnyZbhuJ">三星健康的部分监测功能有地区限制。在 JumpReplay 的意图拦截器（Shizuku + 系统助手）中输入以下命令，直接拉起三星健康主界面：</p>
+    <div data-page-node-id="QASuyYTicArTEApZTHElhB" class="cmd">intent:#Intent;launchFlags=0x10400000;component=com.samsung.android.shealthmonitor/com.samsung.android.shealthmonitor.home.ui.activity.SHealthMonitorMainActivity;end</div>
+  </article>
+
+  <article data-page-node-id="NeODBNDm05k7fLCnYvCB3K" class="lab">
+    <h3 data-page-node-id="cLtNQzVQs6EBXqdaLmUODL">手表启动 Shizuku v13.7.0 · 三步定位法</h3>
+    <p data-page-node-id="9ulvni1No0uFIdklfWrEQL">在手表这类特殊设备上启动 Shizuku 时，先用 adb 摸清它的底细，把输出发给 AI 让 AI 拼命令：</p>
+    <div data-page-node-id="jhm24HXP8LOwxAra5C9d8E" class="cmd"><span data-page-node-id="srZUhE56ymzxVCpEbK756x" class="cm"># ① 调查包名</span>
+adb shell pm list packages | findstr /i "shizuku"
+
+<span data-page-node-id="HAyBoRZNwn99xZNsbA1ZeI" class="cm"># ② 调查安装路径</span>
+adb shell pm path moe.shizuku.privileged.api
+
+<span data-page-node-id="HBZpI1XEdxQCEkLCkGY1Vi" class="cm"># ③ 调查原生库目录</span>
+adb shell dumpsys package moe.shizuku.privileged.api | findstr /i "nativeLibraryDir"</div>
+  </article>
+</section>
+
+<!-- ============ 感想收尾 ============ -->
+<div data-page-node-id="MnyCF633uOVO295Doxy4rJ" class="afterword">
+  <blockquote data-page-node-id="GHU5AVwvgg4neQC8LcKcsL">
+    <p data-page-node-id="z9eg142R7VqXDKnJlnqel7">永久 root 既要对抗谷歌三绿，又要隐藏 root 对抗各路应用的检测，强依赖于社区各组件的更新。而通常检测方案来得比社区隐藏方案快，很尴尬。</p>
+    <div data-page-node-id="QqzghaPo6VLyXwGBRv0Oy1" class="who">— SIMON · 手机使用感想</div>
+  </blockquote>
+</div>
+
+<!-- 回退 / 前进 -->
+<nav data-page-node-id="VgryHWTyC5D4xCYHKgyRgx" class="pager">
+  <a data-page-node-id="ES0dXdWoQ7HzjAHxccfE10" class="prev" style="--accent:var(--lime)" href="play.html" title="回到兴趣页"><span data-page-node-id="ZvVXzQG9UdAbgMmrDtToS1" class="dir">← 返回</span><span data-page-node-id="FGnSghvfFBYSoCYX4pmGdT" class="pname">Play · 兴趣爱好</span></a>
+</nav>
+
+<!-- 封底 -->
+<div data-page-node-id="khgh8SlT9jyRBeHtC9GsEX" class="outro">
+  <div data-page-node-id="TYfYqHbSlA4j1jhCW8tyYq" class="blob ob1 dotted"></div>
+  <div data-page-node-id="oHCpAedc7SPK35eOlrnU1n" class="blob ob2 dotted"></div>
+  <div data-page-node-id="ctaz1pJRoGdwQMCWjiHxJ4" class="blob ob3"></div>
+  <div data-page-node-id="SnZ5hXb3ELzhfUjFifOb1z" class="blob ob4"></div>
+  <div data-page-node-id="QzUz0BJDKcm7bCrbYUqOfb" class="blob ob5"></div>
+  <h2 data-page-node-id="LwawOK0NuMZ9PrFgf0PtHb">Thanks for visiting!</h2>
+  <div data-page-node-id="r7GVsHkgVNqNMGqiAEne0b" class="zh">艰难做设计，认真地玩。</div>
+  <a data-page-node-id="jFXVWjkg7zeis6DenzCSYf" class="top" href="#" aria-label="回到顶部">↑</a>
+</div>
+
+<!-- 底部粉色曲线：横向贯穿整页 -->
+<div data-page-node-id="MJ3fZxx2U0wcZb4eWyqyOu" class="swoosh" aria-hidden="true">
+  <svg data-page-node-id="AG3HbTSditO7uLfs4d23yj" viewBox="0 0 1440 180" preserveAspectRatio="none">
+    <path data-page-node-id="hlWlNq2qEtFceqkb7RvMQK" class="sw-line" d="M-60,112 C220,18 430,168 700,92 C930,28 1120,152 1500,66"></path>
+    <path data-page-node-id="JCIZpPlzDHy64LtHeXIvCI" class="sw-thin" d="M-60,146 C200,62 420,196 690,126 C930,64 1130,186 1500,100"></path>
+  </svg>
+</div>
+
+<footer data-page-node-id="dQKBUQ8O4hNKBNhtlrK7ez" class="site-footer">© 2026 Simon — 艰难做设计，认真地玩。<span id="busuanzi_container_site_pv" style="display:none"> · 本站总访问 <span id="busuanzi_value_site_pv"></span> 次</span><span id="busuanzi_container_site_uv" style="display:none"> · <span id="busuanzi_value_site_uv"></span> 位访客</span></footer>
+
+
+
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- ============ 音乐播放器 ============ -->
+<style>
+  .mp-fab{position:fixed;top:7.4rem;right:3rem;z-index:12;width:4.2rem;height:4.2rem;border-radius:50%;background:#fff;border:none;cursor:pointer;box-shadow:0 2px 14px rgba(28,27,24,.08);display:flex;align-items:center;justify-content:center;transition:transform .25s ease;padding:0}
+  .mp-fab:hover{transform:scale(1.08)}
+  .mp-disc{width:3rem;height:3rem;border-radius:50%;display:block;position:relative;background:radial-gradient(circle, var(--yellow) 0 27%, #1C1B18 28% 58%, #3a3830 59% 70%, #1C1B18 71% 100%);animation:none}
+  .mp-disc::after{content:"";position:absolute;inset:37%;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}
+  .mp-fab.on .mp-disc{animation:mpspin 3.5s linear infinite}
+  @keyframes mpspin{to{transform:rotate(360deg)}}
+  .mp-panel{position:fixed;top:12.2rem;right:3rem;z-index:12;width:19rem;background:#fff;border:3px solid var(--ink);border-radius:1.2rem;box-shadow:8px 8px 0 rgba(28,27,24,.9);padding:1.1rem 1.2rem 1.2rem;display:none;transform-origin:top right}
+  .mp-panel.open{display:block;animation:mpin .22s ease}
+  @keyframes mpin{from{opacity:0;transform:translateY(-8px) scale(.96)}to{opacity:1;transform:none}}
+  .mp-title{font-family:"Playfair Display",serif;font-style:italic;font-weight:600;font-size:1.12rem;line-height:1.35;min-height:1.5em}
+  .mp-no{font-size:.7rem;letter-spacing:.22em;color:#8b897f;margin-top:.2rem}
+  .mp-bar{margin-top:.8rem;height:.55rem;background:var(--paper);border:2px solid var(--ink);border-radius:999px;cursor:pointer;position:relative;overflow:hidden;touch-action:none}
+  .mp-bar i{position:absolute;top:0;left:0;bottom:0;width:0%;background:var(--magenta);display:block;border-radius:999px}
+  .mp-time{display:flex;justify-content:space-between;font-size:.7rem;color:#8b897f;margin-top:.35rem;letter-spacing:.06em}
+  .mp-ctrl{display:flex;gap:.55rem;margin-top:.85rem;align-items:center}
+  .mp-btn{flex:1;height:2.5rem;border-radius:999px;border:2.5px solid var(--ink);background:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:transform .15s, box-shadow .15s;font-family:inherit;color:var(--ink);padding:0}
+  .mp-btn:hover{transform:translateY(-2px);box-shadow:3px 3px 0 var(--ink)}
+  .mp-btn.main{background:var(--yellow);font-size:1.1rem}
+  .mp-btn.listbtn{flex:0 0 2.5rem}
+  .mp-btn.listbtn.on{background:var(--teal)}
+  .mp-list{margin-top:.85rem;max-height:15rem;overflow-y:auto;border:2px solid var(--ink);border-radius:.8rem;background:var(--paper);display:none}
+  .mp-list.open{display:block}
+  .mp-list button{display:flex;gap:.6rem;width:100%;text-align:left;padding:.5rem .8rem;border:none;background:none;cursor:pointer;font-size:.82rem;font-family:inherit;color:var(--ink);border-bottom:1px dashed rgba(28,27,24,.18);align-items:baseline}
+  .mp-list button:last-child{border-bottom:none}
+  .mp-list button:hover{background:#fff}
+  .mp-list button.cur{background:var(--yellow);font-weight:700}
+  .mp-list .n{font-size:.68rem;color:#8b897f;flex:0 0 1.4em}
+  .mp-hint{position:fixed;top:12.4rem;right:3rem;z-index:13;background:#fff;border:2.5px solid var(--ink);border-radius:999px;box-shadow:5px 5px 0 var(--magenta);padding:.55rem 1.05rem;font-size:.8rem;font-weight:700;display:none;animation:mphint 1.3s ease infinite alternate;white-space:nowrap;cursor:pointer}
+  .mp-framed .mp-fab,.mp-framed .mp-panel,.mp-framed .mp-hint{display:none!important}
+  @keyframes mphint{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+  @media (max-width:768px){
+    .mp-fab{top:5.6rem;right:1.4rem;width:3.6rem;height:3.6rem}
+    .mp-disc{width:2.5rem;height:2.5rem}
+    .mp-panel{left:.8rem;right:.8rem;width:auto;top:10rem}
+    .mp-hint{top:9.8rem;right:1.4rem;font-size:.72rem;padding:.45rem .85rem}
+  }
+</style>
+<button class="mp-fab" id="mpFab" aria-label="音乐播放器" title="音乐播放器"><span class="mp-disc"></span></button>
+<div class="mp-hint" id="mpHint">点一下任意位置，随机放首歌 ♪</div>
+<div class="mp-panel" id="mpPanel">
+  <div class="mp-title" id="mpTitle">点播放，随机来一首</div>
+  <div class="mp-no" id="mpNo">MUSIC PLAYER</div>
+  <div class="mp-bar" id="mpBar"><i id="mpFill"></i></div>
+  <div class="mp-time"><span id="mpCur">0:00</span><span id="mpDur">--:--</span></div>
+  <div class="mp-ctrl">
+    <button class="mp-btn" id="mpPrev" title="上一首">⏮</button>
+    <button class="mp-btn main" id="mpPlay" title="播放 / 暂停">▶</button>
+    <button class="mp-btn" id="mpNext" title="下一首">⏭</button>
+    <button class="mp-btn listbtn" id="mpListBtn" title="曲目列表">☰</button>
+  </div>
+  <div class="mp-list" id="mpList"></div>
+</div>
+<audio id="mpAudio" preload="none"></audio>
+<script>
+(function(){
+  /* 壳模式（本页在 iframe 里）：隐藏本页播放器，拦截站内导航转发给壳，由壳统一出声 */
+  if (window.top !== window.self){
+    document.documentElement.classList.add('mp-framed');
+    document.addEventListener('click', function(e){
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a || !a.href || a.target === '_blank') return;
+      var u = new URL(a.href);
+      if (u.origin !== location.origin) return;                      /* 外链放行 */
+      if (u.pathname === location.pathname && u.hash) return;        /* 同页锚点放行 */
+      e.preventDefault();
+      e.stopPropagation();
+      try { window.parent.postMessage({ mpNav: u.pathname + u.search + u.hash }, '*'); } catch (err) {}
+    }, true);
+    try { window.parent.postMessage({ mpLoaded: true, url: location.pathname, title: document.title }, '*'); } catch (err) {}
+    return;
+  }
+  var SONGS=[
+    {no:"01",title:"無眠之惘",file:"01.ogg"},
+    {no:"02",title:"琴弦呀，琴弦",file:"02.ogg"},
+    {no:"03",title:"自由頌（巴揚版）",file:"03.ogg"},
+    {no:"04",title:"戍望者的歌",file:"04.ogg"},
+    {no:"05",title:"爐邊遐思",file:"05.ogg"},
+    {no:"06",title:"我曾經愛過你（管弦樂版）",file:"06.ogg"},
+    {no:"07",title:"自由頌",file:"07.ogg"},
+    {no:"08",title:"水上挽月",file:"08.ogg"},
+    {no:"09",title:"我曾經愛過你",file:"09.ogg"},
+    {no:"10",title:"蒼鏑呈光",file:"10.ogg"},
+    {no:"11",title:"燃燒的蠟炬",file:"11.ogg"},
+    {no:"12",title:"叩冰墾壤",file:"12.ogg"},
+    {no:"13",title:"故事中的故事",file:"13.ogg"},
+    {no:"14",title:"無淚的哀聲",file:"14.ogg"},
+    {no:"15",title:"沒有英雄的敘事詩",file:"15.ogg"},
+    {no:"16",title:"在荒涼的北國",file:"16.ogg"},
+    {no:"17",title:"荒山皚皚",file:"17.ogg"},
+    {no:"18",title:"睡鄉長夢",file:"18.ogg"},
+    {no:"19",title:"凡雪終融",file:"19.ogg"},
+    {no:"20",title:"如靄似檬",file:"20.ogg"},
+    {no:"21",title:"嘆往月光",file:"21.ogg"},
+    {no:"22",title:"愛得其所",file:"22.ogg"},
+    {no:"23",title:"迴環的水波",file:"23.ogg"},
+    {no:"24",title:"固執的冰風",file:"24.ogg"},
+    {no:"25",title:"疾行銳進",file:"25.ogg"},
+    {no:"26",title:"砥志研想",file:"26.ogg"},
+    {no:"27",title:"拂向柔風",file:"27.ogg"},
+    {no:"28",title:"致松針",file:"28.ogg"},
+    {no:"29",title:"落雪無聲",file:"29.ogg"},
+    {no:"30",title:"白日已在暗中",file:"30.ogg"},
+    {no:"31",title:"燒燈續晝",file:"31.ogg"},
+    {no:"32",title:"雪撫夜霜",file:"32.ogg"},
+    {no:"33",title:"如沐月中",file:"33.ogg"},
+    {no:"34",title:"墜歡莫拾",file:"34.ogg"},
+    {no:"35",title:"星與舫的幽歌",file:"35.ogg"},
+    {no:"36",title:"白樺林的夜曲",file:"36.ogg"},
+    {no:"37",title:"月上水影",file:"37.ogg"},
+    {no:"38",title:"潮汐藻歌",file:"38.ogg"},
+    {no:"39",title:"相逐妄出",file:"39.ogg"},
+    {no:"40",title:"疑似之間",file:"40.ogg"},
+    {no:"41",title:"渡往幽世",file:"41.ogg"},
+    {no:"42",title:"某與某的辯題",file:"42.ogg"},
+    {no:"43",title:"失魂靈的渡口",file:"43.ogg"},
+    {no:"44",title:"無吟者的詩章",file:"44.ogg"},
+    {no:"45",title:"蒼白的騎行",file:"45.ogg"},
+    {no:"46",title:"未束的誓言",file:"46.ogg"},
+    {no:"47",title:"念當終亡",file:"47.ogg"},
+    {no:"48",title:"無恆無生",file:"48.ogg"},
+    {no:"49",title:"既知身是夢",file:"49.ogg"},
+    {no:"50",title:"歸向雪都",file:"50.ogg"}
+  ];
+  var audio = document.getElementById('mpAudio'),
+      fab = document.getElementById('mpFab'),
+      panel = document.getElementById('mpPanel'),
+      elTitle = document.getElementById('mpTitle'),
+      elNo = document.getElementById('mpNo'),
+      elBar = document.getElementById('mpBar'),
+      elFill = document.getElementById('mpFill'),
+      elCur = document.getElementById('mpCur'),
+      elDur = document.getElementById('mpDur'),
+      bPlay = document.getElementById('mpPlay'),
+      bPrev = document.getElementById('mpPrev'),
+      bNext = document.getElementById('mpNext'),
+      bListBtn = document.getElementById('mpListBtn'),
+      elList = document.getElementById('mpList');
+  var cur = -1, wantPlay = false, pending = false, pendingSeek = -1, lastSave = 0;
+  var hintEl = document.getElementById('mpHint');
+  audio.volume = 0.55;  /* 不太响也不太轻 */
+  function showHint(){ hintEl.style.display = 'block'; }
+  function hideHint(){ hintEl.style.display = 'none'; }
+  /* 跨页记忆：切页前把曲号/进度/是否在播存进 sessionStorage，新页面无缝接上 */
+  function saveState(force){
+    if (cur < 0) return;
+    var now = Date.now();
+    if (!force && now - lastSave < 1000) return;
+    lastSave = now;
+    try {
+      sessionStorage.setItem('mpState', JSON.stringify({ cur: cur, t: audio.currentTime || 0, playing: !audio.paused }));
+    } catch (err) {}
+  }
+
+  var items = [];
+  SONGS.forEach(function(s, i){
+    var b = document.createElement('button');
+    var n = document.createElement('span'); n.className = 'n'; n.textContent = s.no;
+    var t = document.createElement('span'); t.textContent = s.title;
+    b.appendChild(n); b.appendChild(t);
+    b.addEventListener('click', function(){ play(i); });
+    elList.appendChild(b);
+    items.push(b);
+  });
+
+  function fmt(t){
+    if (!isFinite(t)) return '--:--';
+    t = Math.round(t);
+    return Math.floor(t/60) + ':' + ('0'+(t%60)).slice(-2);
+  }
+  function markCur(){
+    items.forEach(function(b, i){ b.classList.toggle('cur', i === cur); });
+    if (cur >= 0){
+      var li = items[cur];
+      if (li.scrollIntoView) li.scrollIntoView({block:'nearest'});
+    }
+  }
+  function play(i, seekTo){
+    cur = ((i % SONGS.length) + SONGS.length) % SONGS.length;
+    wantPlay = true;
+    pending = false;
+    pendingSeek = (seekTo && seekTo > 0) ? seekTo : -1;
+    hideHint();
+    audio.src = 'music/' + SONGS[cur].file;
+    var p = audio.play();
+    if (p) p.catch(function(){
+      /* 进站自动播放被浏览器拦截：曲子已选好，等访客任意一次点击/按键立刻响起 */
+      pending = true;
+      showHint();
+      armGesture();
+    });
+    elTitle.textContent = SONGS[cur].title;
+    elNo.textContent = 'TRACK ' + SONGS[cur].no + ' / ' + SONGS.length;
+    elFill.style.width = '0%';
+    elCur.textContent = '0:00';
+    elDur.textContent = '--:--';
+    markCur();
+  }
+  function randomPlay(){
+    var r;
+    do { r = Math.floor(Math.random() * SONGS.length); } while (r === cur && SONGS.length > 1);
+    play(r);
+  }
+  function toggle(){
+    pending = false;
+    hideHint();
+    if (audio.paused){
+      if (cur < 0) { randomPlay(); }        /* 第一次点播放：随机 */
+      else { audio.play().catch(function(){}); }
+    } else {
+      audio.pause();
+    }
+  }
+  bPlay.addEventListener('click', toggle);
+  bPrev.addEventListener('click', function(){ play(cur < 0 ? 0 : cur - 1); });
+  bNext.addEventListener('click', function(){ play(cur < 0 ? 0 : cur + 1); });
+  audio.addEventListener('play', function(){
+    bPlay.textContent = '⏸';
+    fab.classList.add('on');
+  });
+  audio.addEventListener('pause', function(){
+    bPlay.textContent = '▶';
+    fab.classList.remove('on');
+  });
+  audio.addEventListener('ended', function(){ saveState(true); play(cur + 1); });   /* 播完顺序接下一首 */
+  audio.addEventListener('timeupdate', function(){
+    if (audio.duration){
+      elFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      elCur.textContent = fmt(audio.currentTime);
+      saveState(false);
+    }
+  });
+  audio.addEventListener('loadedmetadata', function(){
+    if (audio.duration === Infinity){
+      /* Ogg/Opus 在部分浏览器拿不到总时长：先跳到结尾骗出真实时长再回到应到的位置 */
+      audio.currentTime = 1e7;
+      var restore = function(){
+        audio.removeEventListener('timeupdate', restore);
+        if (pendingSeek >= 0){
+          audio.currentTime = Math.min(pendingSeek, Math.max(0, audio.duration - 1));
+          pendingSeek = -1;
+        } else {
+          audio.currentTime = 0;
+        }
+        elDur.textContent = fmt(audio.duration);
+      };
+      audio.addEventListener('timeupdate', restore);
+    } else {
+      if (pendingSeek >= 0){
+        audio.currentTime = Math.min(pendingSeek, Math.max(0, audio.duration - 1));
+        pendingSeek = -1;
+      }
+      elDur.textContent = fmt(audio.duration);
+    }
+  });
+  /* 进度条：点击跳转 + 按住拖动 */
+  var dragging = false;
+  function seekFromEvent(e){
+    if (!audio.duration || audio.duration === Infinity) return;
+    var r = elBar.getBoundingClientRect();
+    var x = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    var ratio = Math.min(1, Math.max(0, (x - r.left) / r.width));
+    try { audio.currentTime = ratio * audio.duration; } catch (err) {}
+    elFill.style.width = (ratio * 100) + '%';
+    elCur.textContent = fmt(ratio * audio.duration);
+  }
+  elBar.addEventListener('pointerdown', function(e){
+    if (!audio.duration || audio.duration === Infinity) return;
+    dragging = true;
+    try { elBar.setPointerCapture(e.pointerId); } catch (err) {}
+    seekFromEvent(e);
+  });
+  elBar.addEventListener('pointermove', function(e){ if (dragging) seekFromEvent(e); });
+  elBar.addEventListener('pointerup', function(){ dragging = false; });
+  elBar.addEventListener('pointercancel', function(){ dragging = false; });
+  bListBtn.addEventListener('click', function(){
+    var open = elList.classList.toggle('open');
+    bListBtn.classList.toggle('on', open);
+    markCur();
+  });
+  fab.addEventListener('click', function(){
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) markCur();
+  });
+  /* 点面板外面收起面板 */
+  document.addEventListener('click', function(e){
+    if (!panel.classList.contains('open')) return;
+    if (panel.contains(e.target) || fab.contains(e.target)) return;
+    panel.classList.remove('open');
+    elList.classList.remove('open');
+    bListBtn.classList.remove('on');
+  });
+  function tryStart(){
+    if (!audio.paused || cur < 0) return true;
+    var p = audio.play();
+    if (p && p.catch){
+      p.catch(function(){
+        /* 这次仍被拦截：重新挂起等下一次交互（循环直到成功或用户手动操作） */
+        pending = true;
+        showHint();
+        armGesture();
+      });
+      return false;
+    }
+    return true;
+  }
+  function armGesture(){
+    ['pointerdown', 'touchstart', 'keydown'].forEach(function(ev){
+      document.addEventListener(ev, function go(){
+        document.removeEventListener(ev, go);
+        if (!pending) return;
+        pending = false;
+        hideHint();
+        tryStart();
+      }, { passive: true });
+    });
+  }
+  hintEl.addEventListener('click', function(){
+    pending = false;
+    hideHint();
+    tryStart();
+  });
+  /* 进站：有跨页记忆就无缝续播（换页前在播的曲子接着响、接着进度）；没有记忆则随机选曲开播 */
+  var saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem('mpState') || 'null'); } catch (err) {}
+  if (saved && typeof saved.cur === 'number' && saved.cur >= 0 && saved.cur < SONGS.length){
+    if (saved.playing){
+      hintEl.textContent = '点一下，继续放歌 ♪';
+      play(saved.cur, saved.t);
+    } else {
+      /* 上次切页时是暂停状态：恢复曲子和进度到面板，不自动出声 */
+      cur = saved.cur;
+      elTitle.textContent = SONGS[cur].title;
+      elNo.textContent = 'TRACK ' + SONGS[cur].no + ' / ' + SONGS.length;
+      markCur();
+      audio.src = 'music/' + SONGS[cur].file;
+      pendingSeek = (saved.t && saved.t > 0) ? saved.t : -1;
+      elFill.style.width = '0%'; elCur.textContent = '0:00'; elDur.textContent = '--:--';
+    }
+  } else {
+    play(Math.floor(Math.random() * SONGS.length));
+  }
+  /* 离开页面（点链接去别的页面）前保存状态，供下一页续播；移动端 pagehide 不可靠，补 visibilitychange */
+  window.addEventListener('pagehide', function(){ saveState(true); });
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') saveState(true); });
+  /* 前进/后退从往返缓存（bfcache）恢复时：内存状态还在，直接续播，不重新加载 */
+  window.addEventListener('pageshow', function(e){
+    if (e.persisted && cur >= 0 && audio.paused){
+      var p = audio.play();
+      if (p && p.catch) p.catch(function(){});
+    }
+  });
+})();
+</script>
+
+</body></html>

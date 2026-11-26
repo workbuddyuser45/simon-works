@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html data-page-node-id="FGvlx3kBR21qlaiwtgK1gj" lang="zh-CN"><head data-page-node-id="UmCn4rVcNPSZFo9Y3p5380">
+<meta data-page-node-id="5J5HnWcj8GwUv1PTOp9phD" charset="UTF-8">
+<meta data-page-node-id="RmFAFG3Cs6ClpGhnX3bMSJ" name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-page-node-id="2l66mLTHXtcJyVSGGhZ9Lj" data-pnid-children="WeKZ6fgyGe5ZRW0IWdOZOP">Simon — Serious about fun</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style data-page-node-id="E8Bv7F2cLfA92HZajQUjU5" data-pnid-children="W3UwnTymxwBJJdHE8lHI1C">
+  html{font-size:18px;overflow-x:clip}  /* 13 英寸笔记本观看优化：根字号 16→18 */
+
+  /* ============ 自包含基础样式（单文件打开也能完整显示） ============ */
+  :root{
+    --paper:#F1F0EA;--ink:#1C1B18;
+    --yellow:#F5D915;--magenta:#C9316E;--navy:#1F4E9C;
+    --teal:#7FC9E8;--lime:#B9D93B;--coral:#F0907E;--sky:#A8DCE8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:"Noto Sans SC",sans-serif;
+    background:var(--paper);color:var(--ink);
+    overflow-x:hidden;
+  }
+  .blob{
+    position:absolute;z-index:0;
+    mix-blend-mode:multiply;
+    background-color:var(--c);
+    animation:drift var(--d,14s) ease-in-out var(--dl,0s) infinite alternate;
+    will-change:transform;pointer-events:none;
+  }
+  .blob.dotted{
+    background-image:radial-gradient(var(--dot) 2.1px, transparent 2.5px);
+    background-size:11px 11px;
+  }
+  @keyframes drift{
+    0%  {transform:rotate(var(--r,0deg)) translate(0,0) scale(1)}
+    50% {transform:rotate(calc(var(--r,0deg) + 4deg)) translate(1.2%, -2%) scale(1.04)}
+    100%{transform:rotate(calc(var(--r,0deg) - 3deg)) translate(-1.5%, 1.5%) scale(.97)}
+  }
+  .brand{
+    position:absolute;top:2.6rem;left:8vw;z-index:10;
+    font-weight:700;font-size:1.6rem;letter-spacing:.22em;
+    text-decoration:none;color:var(--ink);
+  }
+  .menu{
+    position:absolute;top:2.4rem;right:3rem;z-index:11;
+    width:4.2rem;height:4.2rem;border-radius:50%;
+    background:#fff;cursor:pointer;
+    display:flex;flex-direction:column;gap:.5rem;
+    align-items:center;justify-content:center;
+    box-shadow:0 2px 14px rgba(28,27,24,.08);
+    transition:transform .25s ease;text-decoration:none;
+  }
+  .menu:hover{transform:scale(1.08)}
+  .menu span{display:block;width:1.5rem;height:2px;background:var(--ink);border-radius:2px}
+  @media (max-width:768px){
+    .brand{left:8vw;top:1.6rem}
+    .menu{right:1.4rem;top:1.4rem;width:3.4rem;height:3.4rem}
+  }
+
+  /* ============ 封面专属样式 ============ */
+  .stage{position:relative;min-height:100vh;overflow:hidden}
+  /* 纸张噪点质感 */
+  .stage::after{
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;z-index:1;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.54 0 0 0 0 0.5 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  /* —— 右上角组团 —— */
+  .b1{--c:var(--yellow);--dot:var(--magenta);--r:14deg;--d:16s;
+      width:36vw;height:30vw;top:-10vw;right:-4vw;
+      border-radius:63% 37% 54% 46% / 48% 62% 38% 52%;}
+  .b2{--c:var(--navy);--r:24deg;--d:13s;
+      width:23vw;height:19vw;top:2vw;right:13vw;
+      border-radius:44% 56% 62% 38% / 55% 42% 58% 45%;}
+  .b3{--c:var(--navy);--r:-10deg;--d:15s;opacity:.85;
+      width:14vw;height:11vw;top:16vw;right:2vw;
+      border-radius:52% 48% 40% 60% / 60% 44% 56% 40%;}
+  .b4{--c:var(--teal);--r:8deg;--d:12s;
+      width:6vw;height:5vw;top:24vw;right:26vw;
+      border-radius:56% 44% 58% 42% / 46% 58% 42% 54%;}
+  .b5{--c:var(--coral);--r:-18deg;--d:14s;
+      width:9vw;height:7vw;top:9vw;right:33vw;
+      border-radius:60% 40% 46% 54% / 52% 46% 54% 48%;}
+  .b6{--c:var(--lime);--r:20deg;--d:17s;
+      width:4.5vw;height:4vw;top:27vw;right:6vw;
+      border-radius:50%/50%;}
+  .b7{--c:var(--sky);--r:0deg;--d:18s;
+      width:5vw;height:3.6vw;top:20vw;right:38vw;
+      border-radius:58% 42% 50% 50%/ 60% 40% 60% 40%;}
+  /* —— 中部散点 —— */
+  .b8{--c:var(--sky);--r:-6deg;--d:15s;
+      width:8vw;height:6vw;top:17vw;left:40vw;
+      border-radius:52% 48% 44% 56%/ 58% 42% 58% 42%;}
+  .b9{--c:var(--coral);--r:12deg;--d:13s;
+      width:4.5vw;height:3.6vw;top:24vw;left:47vw;
+      border-radius:56% 44% 52% 48%/50% 54% 46% 50%;}
+  .b10{--c:var(--coral);--r:-14deg;--d:16s;
+      width:3.4vw;height:3vw;top:23vw;left:38vw;
+      border-radius:50%/50%;}
+  /* —— 中部大块 —— */
+  .b11{--c:var(--magenta);--r:-16deg;--d:19s;opacity:.94;
+      width:27vw;height:17vw;top:46%;left:27vw;
+      border-radius:38% 62% 55% 45% / 62% 40% 60% 38%;}
+  .b12{--c:var(--navy);--r:-22deg;--d:14s;opacity:.92;
+      width:22vw;height:11vw;top:38%;right:6vw;
+      border-radius:64% 36% 48% 52% / 46% 64% 36% 54%;}
+  .b13{--c:var(--teal);--r:10deg;--d:12s;opacity:.9;
+      width:6vw;height:5vw;top:50%;right:20vw;
+      border-radius:54% 46% 60% 40%/ 44% 56% 44% 56%;}
+  /* —— 左下角组团 —— */
+  .b14{--c:var(--magenta);--r:6deg;--d:15s;
+      width:12vw;height:10vw;top:56%;left:-4vw;
+      border-radius:44% 56% 58% 42%/ 56% 44% 56% 44%;}
+  .b15{--c:var(--yellow);--dot:var(--magenta);--r:-8deg;--d:17s;
+      width:26vw;height:20vw;top:66%;left:2vw;
+      border-radius:58% 42% 46% 54%/ 52% 58% 42% 48%;}
+  .b16{--c:var(--teal);--dot:var(--navy);--r:12deg;--d:14s;
+      width:18vw;height:14vw;top:78%;left:8vw;
+      border-radius:46% 54% 62% 38%/ 58% 44% 56% 42%;}
+  .b17{--c:var(--teal);--dot:var(--navy);--r:-20deg;--d:16s;
+      width:12vw;height:9vw;top:88%;left:-3vw;
+      border-radius:56% 44% 48% 52%/ 44% 56% 44% 56%;}
+  /* —— 右下角 —— */
+  .b18{--c:var(--lime);--r:8deg;--d:18s;
+      width:19vw;height:14vw;top:60%;right:-3vw;
+      border-radius:52% 48% 42% 58%/ 60% 42% 58% 40%;}
+  .b19{--c:var(--coral);--r:-10deg;--d:13s;
+      width:7vw;height:5.5vw;top:84%;right:22vw;
+      border-radius:56% 44% 52% 48%/ 50% 56% 44% 50%;}
+  .b20{--c:var(--yellow);--r:16deg;--d:15s;
+      width:5vw;height:4vw;top:74%;right:30vw;
+      border-radius:50%/50%;}
+
+  /* 主标题 */
+  .hero{position:absolute;z-index:5;top:38%;left:8vw;max-width:60vw}
+  .hero h1{
+    font-family:"Playfair Display",serif;
+    font-style:italic;font-weight:500;
+    font-size:clamp(3rem, 6.5vw, 6.2rem);
+    line-height:1.08;letter-spacing:-.01em;
+    text-shadow:0 1px 0 rgba(255,255,255,.6);
+  }
+  .hero p{
+    margin-top:1.4rem;
+    font-size:clamp(1rem, 1.6vw, 1.5rem);
+    font-weight:500;letter-spacing:.14em;
+  }
+
+  /* News 通知条 */
+  .news{
+    position:absolute;z-index:6;
+    bottom:9%;left:20vw;
+    background:#fff;border-radius:999px 0 0 999px;
+    padding:1.15rem 3.5rem 1.15rem 2.2rem;
+    display:flex;align-items:center;gap:3rem;
+    box-shadow:0 4px 24px rgba(28,27,24,.07);
+    min-width:46vw;
+  }
+  .news .tag{font-weight:700;font-size:.95rem}
+  .news .date{font-size:.85rem;color:#8b897f;margin-top:.2rem}
+  .news .txt{font-size:.92rem;line-height:1.7;max-width:34rem}
+
+  /* 回退 / 前进（右下角） */
+  .turn{
+    position:absolute;z-index:6;bottom:9%;right:3rem;
+    display:flex;gap:1rem;
+  }
+  .turn a{
+    display:flex;flex-direction:column;gap:.4rem;
+    padding:1rem 1.8rem;border-radius:999px;background:#fff;
+    border:2px dotted rgba(28,27,24,.28);text-decoration:none;color:var(--ink);
+    box-shadow:0 4px 18px rgba(28,27,24,.08);
+    transition:transform .25s ease,box-shadow .25s ease;
+  }
+  .turn a:hover{transform:translateY(-5px);box-shadow:0 12px 28px rgba(28,27,24,.14)}
+  .turn .dir{font-size:.72rem;letter-spacing:.28em;color:#8b897f}
+  .turn .pname{
+    font-family:"Playfair Display",serif;font-style:italic;font-weight:500;
+    font-size:1.25rem;transition:color .2s;
+  }
+  .turn a:hover .pname{color:var(--magenta)}
+  .turn .next{align-items:flex-end;text-align:right}
+
+  @media (max-width:768px){
+    .hero{top:30%;max-width:84vw}
+    .turn{display:none}
+    .news{left:6vw;right:0;min-width:0;flex-direction:column;align-items:flex-start;gap:.6rem;border-radius:999px 999px 0 0;padding-bottom:1.4rem}
+  }
+</style>
+<!-- SEO / 分享卡片 / 图标 -->
+<meta name="description" content="Simon 的个人网站——设计作品、品牌提案、武器评测与各种认真玩的东西。Serious about fun.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Simon — Serious about fun">
+<meta property="og:description" content="Simon 的个人网站——设计作品、品牌提案、武器评测与各种认真玩的东西。Serious about fun.">
+<meta property="og:url" content="https://routersamba.sh.cn/index.html">
+<meta property="og:image" content="https://routersamba.sh.cn/og-cover.jpg">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  /* 壳：iframe 铺满视口，页面切换只在 iframe 里发生 */
+  html,body{margin:0;height:100%}
+  #siteFrame{position:fixed;inset:0;width:100%;height:100%;border:0;background:var(--paper,#F1F0EA);display:block}
+</style>
+</head>
+<body>
+
+<!-- ============ 音乐播放器 ============ -->
+<style>
+  .mp-fab{position:fixed;top:7.4rem;right:3rem;z-index:12;width:4.2rem;height:4.2rem;border-radius:50%;background:#fff;border:none;cursor:pointer;box-shadow:0 2px 14px rgba(28,27,24,.08);display:flex;align-items:center;justify-content:center;transition:transform .25s ease;padding:0}
+  .mp-fab:hover{transform:scale(1.08)}
+  .mp-disc{width:3rem;height:3rem;border-radius:50%;display:block;position:relative;background:radial-gradient(circle, var(--yellow) 0 27%, #1C1B18 28% 58%, #3a3830 59% 70%, #1C1B18 71% 100%);animation:none}
+  .mp-disc::after{content:"";position:absolute;inset:37%;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}
+  .mp-fab.on .mp-disc{animation:mpspin 3.5s linear infinite}
+  @keyframes mpspin{to{transform:rotate(360deg)}}
+  .mp-panel{position:fixed;top:12.2rem;right:3rem;z-index:12;width:19rem;background:#fff;border:3px solid var(--ink);border-radius:1.2rem;box-shadow:8px 8px 0 rgba(28,27,24,.9);padding:1.1rem 1.2rem 1.2rem;display:none;transform-origin:top right}
+  .mp-panel.open{display:block;animation:mpin .22s ease}
+  @keyframes mpin{from{opacity:0;transform:translateY(-8px) scale(.96)}to{opacity:1;transform:none}}
+  .mp-title{font-family:"Playfair Display",serif;font-style:italic;font-weight:600;font-size:1.12rem;line-height:1.35;min-height:1.5em}
+  .mp-no{font-size:.7rem;letter-spacing:.22em;color:#8b897f;margin-top:.2rem}
+  .mp-bar{margin-top:.8rem;height:.55rem;background:var(--paper);border:2px solid var(--ink);border-radius:999px;cursor:pointer;position:relative;overflow:hidden;touch-action:none}
+  .mp-bar i{position:absolute;top:0;left:0;bottom:0;width:0%;background:var(--magenta);display:block;border-radius:999px}
+  .mp-time{display:flex;justify-content:space-between;font-size:.7rem;color:#8b897f;margin-top:.35rem;letter-spacing:.06em}
+  .mp-ctrl{display:flex;gap:.55rem;margin-top:.85rem;align-items:center}
+  .mp-btn{flex:1;height:2.5rem;border-radius:999px;border:2.5px solid var(--ink);background:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:transform .15s, box-shadow .15s;font-family:inherit;color:var(--ink);padding:0}
+  .mp-btn:hover{transform:translateY(-2px);box-shadow:3px 3px 0 var(--ink)}
+  .mp-btn.main{background:var(--yellow);font-size:1.1rem}
+  .mp-btn.listbtn{flex:0 0 2.5rem}
+  .mp-btn.listbtn.on{background:var(--teal)}
+  .mp-list{margin-top:.85rem;max-height:15rem;overflow-y:auto;border:2px solid var(--ink);border-radius:.8rem;background:var(--paper);display:none}
+  .mp-list.open{display:block}
+  .mp-list button{display:flex;gap:.6rem;width:100%;text-align:left;padding:.5rem .8rem;border:none;background:none;cursor:pointer;font-size:.82rem;font-family:inherit;color:var(--ink);border-bottom:1px dashed rgba(28,27,24,.18);align-items:baseline}
+  .mp-list button:last-child{border-bottom:none}
+  .mp-list button:hover{background:#fff}
+  .mp-list button.cur{background:var(--yellow);font-weight:700}
+  .mp-list .n{font-size:.68rem;color:#8b897f;flex:0 0 1.4em}
+  .mp-hint{position:fixed;top:12.4rem;right:3rem;z-index:13;background:#fff;border:2.5px solid var(--ink);border-radius:999px;box-shadow:5px 5px 0 var(--magenta);padding:.55rem 1.05rem;font-size:.8rem;font-weight:700;display:none;animation:mphint 1.3s ease infinite alternate;white-space:nowrap;cursor:pointer}
+  .mp-framed .mp-fab,.mp-framed .mp-panel,.mp-framed .mp-hint{display:none!important}
+  @keyframes mphint{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+  @media (max-width:768px){
+    .mp-fab{top:5.6rem;right:1.4rem;width:3.6rem;height:3.6rem}
+    .mp-disc{width:2.5rem;height:2.5rem}
+    .mp-panel{left:.8rem;right:.8rem;width:auto;top:10rem}
+    .mp-hint{top:9.8rem;right:1.4rem;font-size:.72rem;padding:.45rem .85rem}
+  }
+</style>
+<button class="mp-fab" id="mpFab" aria-label="音乐播放器" title="音乐播放器"><span class="mp-disc"></span></button>
+<div class="mp-hint" id="mpHint">点一下任意位置，随机放首歌 ♪</div>
+<div class="mp-panel" id="mpPanel">
+  <div class="mp-title" id="mpTitle">点播放，随机来一首</div>
+  <div class="mp-no" id="mpNo">MUSIC PLAYER</div>
+  <div class="mp-bar" id="mpBar"><i id="mpFill"></i></div>
+  <div class="mp-time"><span id="mpCur">0:00</span><span id="mpDur">--:--</span></div>
+  <div class="mp-ctrl">
+    <button class="mp-btn" id="mpPrev" title="上一首">⏮</button>
+    <button class="mp-btn main" id="mpPlay" title="播放 / 暂停">▶</button>
+    <button class="mp-btn" id="mpNext" title="下一首">⏭</button>
+    <button class="mp-btn listbtn" id="mpListBtn" title="曲目列表">☰</button>
+  </div>
+  <div class="mp-list" id="mpList"></div>
+</div>
+<audio id="mpAudio" preload="none"></audio>
+<script>
+(function(){
+  /* 壳模式（本页在 iframe 里）：隐藏本页播放器，拦截站内导航转发给壳，由壳统一出声 */
+  if (window.top !== window.self){
+    document.documentElement.classList.add('mp-framed');
+    document.addEventListener('click', function(e){
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a || !a.href || a.target === '_blank') return;
+      var u = new URL(a.href);
+      if (u.origin !== location.origin) return;                      /* 外链放行 */
+      if (u.pathname === location.pathname && u.hash) return;        /* 同页锚点放行 */
+      e.preventDefault();
+      e.stopPropagation();
+      try { window.parent.postMessage({ mpNav: u.pathname + u.search + u.hash }, '*'); } catch (err) {}
+    }, true);
+    try { window.parent.postMessage({ mpLoaded: true, url: location.pathname, title: document.title }, '*'); } catch (err) {}
+    return;
+  }
+  var SONGS=[
+    {no:"01",title:"無眠之惘",file:"01.ogg"},
+    {no:"02",title:"琴弦呀，琴弦",file:"02.ogg"},
+    {no:"03",title:"自由頌（巴揚版）",file:"03.ogg"},
+    {no:"04",title:"戍望者的歌",file:"04.ogg"},
+    {no:"05",title:"爐邊遐思",file:"05.ogg"},
+    {no:"06",title:"我曾經愛過你（管弦樂版）",file:"06.ogg"},
+    {no:"07",title:"自由頌",file:"07.ogg"},
+    {no:"08",title:"水上挽月",file:"08.ogg"},
+    {no:"09",title:"我曾經愛過你",file:"09.ogg"},
+    {no:"10",title:"蒼鏑呈光",file:"10.ogg"},
+    {no:"11",title:"燃燒的蠟炬",file:"11.ogg"},
+    {no:"12",title:"叩冰墾壤",file:"12.ogg"},
+    {no:"13",title:"故事中的故事",file:"13.ogg"},
+    {no:"14",title:"無淚的哀聲",file:"14.ogg"},
+    {no:"15",title:"沒有英雄的敘事詩",file:"15.ogg"},
+    {no:"16",title:"在荒涼的北國",file:"16.ogg"},
+    {no:"17",title:"荒山皚皚",file:"17.ogg"},
+    {no:"18",title:"睡鄉長夢",file:"18.ogg"},
+    {no:"19",title:"凡雪終融",file:"19.ogg"},
+    {no:"20",title:"如靄似檬",file:"20.ogg"},
+    {no:"21",title:"嘆往月光",file:"21.ogg"},
+    {no:"22",title:"愛得其所",file:"22.ogg"},
+    {no:"23",title:"迴環的水波",file:"23.ogg"},
+    {no:"24",title:"固執的冰風",file:"24.ogg"},
+    {no:"25",title:"疾行銳進",file:"25.ogg"},
+    {no:"26",title:"砥志研想",file:"26.ogg"},
+    {no:"27",title:"拂向柔風",file:"27.ogg"},
+    {no:"28",title:"致松針",file:"28.ogg"},
+    {no:"29",title:"落雪無聲",file:"29.ogg"},
+    {no:"30",title:"白日已在暗中",file:"30.ogg"},
+    {no:"31",title:"燒燈續晝",file:"31.ogg"},
+    {no:"32",title:"雪撫夜霜",file:"32.ogg"},
+    {no:"33",title:"如沐月中",file:"33.ogg"},
+    {no:"34",title:"墜歡莫拾",file:"34.ogg"},
+    {no:"35",title:"星與舫的幽歌",file:"35.ogg"},
+    {no:"36",title:"白樺林的夜曲",file:"36.ogg"},
+    {no:"37",title:"月上水影",file:"37.ogg"},
+    {no:"38",title:"潮汐藻歌",file:"38.ogg"},
+    {no:"39",title:"相逐妄出",file:"39.ogg"},
+    {no:"40",title:"疑似之間",file:"40.ogg"},
+    {no:"41",title:"渡往幽世",file:"41.ogg"},
+    {no:"42",title:"某與某的辯題",file:"42.ogg"},
+    {no:"43",title:"失魂靈的渡口",file:"43.ogg"},
+    {no:"44",title:"無吟者的詩章",file:"44.ogg"},
+    {no:"45",title:"蒼白的騎行",file:"45.ogg"},
+    {no:"46",title:"未束的誓言",file:"46.ogg"},
+    {no:"47",title:"念當終亡",file:"47.ogg"},
+    {no:"48",title:"無恆無生",file:"48.ogg"},
+    {no:"49",title:"既知身是夢",file:"49.ogg"},
+    {no:"50",title:"歸向雪都",file:"50.ogg"}
+  ];
+  var audio = document.getElementById('mpAudio'),
+      fab = document.getElementById('mpFab'),
+      panel = document.getElementById('mpPanel'),
+      elTitle = document.getElementById('mpTitle'),
+      elNo = document.getElementById('mpNo'),
+      elBar = document.getElementById('mpBar'),
+      elFill = document.getElementById('mpFill'),
+      elCur = document.getElementById('mpCur'),
+      elDur = document.getElementById('mpDur'),
+      bPlay = document.getElementById('mpPlay'),
+      bPrev = document.getElementById('mpPrev'),
+      bNext = document.getElementById('mpNext'),
+      bListBtn = document.getElementById('mpListBtn'),
+      elList = document.getElementById('mpList');
+  var cur = -1, wantPlay = false, pending = false, pendingSeek = -1, lastSave = 0;
+  var hintEl = document.getElementById('mpHint');
+  audio.volume = 0.55;  /* 不太响也不太轻 */
+  function showHint(){ hintEl.style.display = 'block'; }
+  function hideHint(){ hintEl.style.display = 'none'; }
+  /* 跨页记忆：切页前把曲号/进度/是否在播存进 sessionStorage，新页面无缝接上 */
+  function saveState(force){
+    if (cur < 0) return;
+    var now = Date.now();
+    if (!force && now - lastSave < 1000) return;
+    lastSave = now;
+    try {
+      sessionStorage.setItem('mpState', JSON.stringify({ cur: cur, t: audio.currentTime || 0, playing: !audio.paused }));
+    } catch (err) {}
+  }
+
+  var items = [];
+  SONGS.forEach(function(s, i){
+    var b = document.createElement('button');
+    var n = document.createElement('span'); n.className = 'n'; n.textContent = s.no;
+    var t = document.createElement('span'); t.textContent = s.title;
+    b.appendChild(n); b.appendChild(t);
+    b.addEventListener('click', function(){ play(i); });
+    elList.appendChild(b);
+    items.push(b);
+  });
+
+  function fmt(t){
+    if (!isFinite(t)) return '--:--';
+    t = Math.round(t);
+    return Math.floor(t/60) + ':' + ('0'+(t%60)).slice(-2);
+  }
+  function markCur(){
+    items.forEach(function(b, i){ b.classList.toggle('cur', i === cur); });
+    if (cur >= 0){
+      var li = items[cur];
+      if (li.scrollIntoView) li.scrollIntoView({block:'nearest'});
+    }
+  }
+  function play(i, seekTo){
+    cur = ((i % SONGS.length) + SONGS.length) % SONGS.length;
+    wantPlay = true;
+    pending = false;
+    pendingSeek = (seekTo && seekTo > 0) ? seekTo : -1;
+    hideHint();
+    audio.src = 'music/' + SONGS[cur].file;
+    var p = audio.play();
+    if (p) p.catch(function(){
+      /* 进站自动播放被浏览器拦截：曲子已选好，等访客任意一次点击/按键立刻响起 */
+      pending = true;
+      showHint();
+      armGesture();
+    });
+    elTitle.textContent = SONGS[cur].title;
+    elNo.textContent = 'TRACK ' + SONGS[cur].no + ' / ' + SONGS.length;
+    elFill.style.width = '0%';
+    elCur.textContent = '0:00';
+    elDur.textContent = '--:--';
+    markCur();
+  }
+  function randomPlay(){
+    var r;
+    do { r = Math.floor(Math.random() * SONGS.length); } while (r === cur && SONGS.length > 1);
+    play(r);
+  }
+  function toggle(){
+    pending = false;
+    hideHint();
+    if (audio.paused){
+      if (cur < 0) { randomPlay(); }        /* 第一次点播放：随机 */
+      else { audio.play().catch(function(){}); }
+    } else {
+      audio.pause();
+    }
+  }
+  bPlay.addEventListener('click', toggle);
+  bPrev.addEventListener('click', function(){ play(cur < 0 ? 0 : cur - 1); });
+  bNext.addEventListener('click', function(){ play(cur < 0 ? 0 : cur + 1); });
+  audio.addEventListener('play', function(){
+    bPlay.textContent = '⏸';
+    fab.classList.add('on');
+  });
+  audio.addEventListener('pause', function(){
+    bPlay.textContent = '▶';
+    fab.classList.remove('on');
+  });
+  audio.addEventListener('ended', function(){ saveState(true); play(cur + 1); });   /* 播完顺序接下一首 */
+  audio.addEventListener('timeupdate', function(){
+    if (audio.duration){
+      elFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      elCur.textContent = fmt(audio.currentTime);
+      saveState(false);
+    }
+  });
+  audio.addEventListener('loadedmetadata', function(){
+    if (audio.duration === Infinity){
+      /* Ogg/Opus 在部分浏览器拿不到总时长：先跳到结尾骗出真实时长再回到应到的位置 */
+      audio.currentTime = 1e7;
+      var restore = function(){
+        audio.removeEventListener('timeupdate', restore);
+        if (pendingSeek >= 0){
+          audio.currentTime = Math.min(pendingSeek, Math.max(0, audio.duration - 1));
+          pendingSeek = -1;
+        } else {
+          audio.currentTime = 0;
+        }
+        elDur.textContent = fmt(audio.duration);
+      };
+      audio.addEventListener('timeupdate', restore);
+    } else {
+      if (pendingSeek >= 0){
+        audio.currentTime = Math.min(pendingSeek, Math.max(0, audio.duration - 1));
+        pendingSeek = -1;
+      }
+      elDur.textContent = fmt(audio.duration);
+    }
+  });
+  /* 进度条：点击跳转 + 按住拖动 */
+  var dragging = false;
+  function seekFromEvent(e){
+    if (!audio.duration || audio.duration === Infinity) return;
+    var r = elBar.getBoundingClientRect();
+    var x = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    var ratio = Math.min(1, Math.max(0, (x - r.left) / r.width));
+    try { audio.currentTime = ratio * audio.duration; } catch (err) {}
+    elFill.style.width = (ratio * 100) + '%';
+    elCur.textContent = fmt(ratio * audio.duration);
+  }
+  elBar.addEventListener('pointerdown', function(e){
+    if (!audio.duration || audio.duration === Infinity) return;
+    dragging = true;
+    try { elBar.setPointerCapture(e.pointerId); } catch (err) {}
+    seekFromEvent(e);
+  });
+  elBar.addEventListener('pointermove', function(e){ if (dragging) seekFromEvent(e); });
+  elBar.addEventListener('pointerup', function(){ dragging = false; });
+  elBar.addEventListener('pointercancel', function(){ dragging = false; });
+  bListBtn.addEventListener('click', function(){
+    var open = elList.classList.toggle('open');
+    bListBtn.classList.toggle('on', open);
+    markCur();
+  });
+  fab.addEventListener('click', function(){
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) markCur();
+  });
+  /* 点面板外面收起面板 */
+  document.addEventListener('click', function(e){
+    if (!panel.classList.contains('open')) return;
+    if (panel.contains(e.target) || fab.contains(e.target)) return;
+    panel.classList.remove('open');
+    elList.classList.remove('open');
+    bListBtn.classList.remove('on');
+  });
+  function tryStart(){
+    if (!audio.paused || cur < 0) return true;
+    var p = audio.play();
+    if (p && p.catch){
+      p.catch(function(){
+        /* 这次仍被拦截：重新挂起等下一次交互（循环直到成功或用户手动操作） */
+        pending = true;
+        showHint();
+        armGesture();
+      });
+      return false;
+    }
+    return true;
+  }
+  function armGesture(){
+    ['pointerdown', 'touchstart', 'keydown'].forEach(function(ev){
+      document.addEventListener(ev, function go(){
+        document.removeEventListener(ev, go);
+        if (!pending) return;
+        pending = false;
+        hideHint();
+        tryStart();
+      }, { passive: true });
+    });
+  }
+  hintEl.addEventListener('click', function(){
+    pending = false;
+    hideHint();
+    tryStart();
+  });
+  /* 进站：有跨页记忆就无缝续播（换页前在播的曲子接着响、接着进度）；没有记忆则随机选曲开播 */
+  var saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem('mpState') || 'null'); } catch (err) {}
+  if (saved && typeof saved.cur === 'number' && saved.cur >= 0 && saved.cur < SONGS.length){
+    if (saved.playing){
+      hintEl.textContent = '点一下，继续放歌 ♪';
+      play(saved.cur, saved.t);
+    } else {
+      /* 上次切页时是暂停状态：恢复曲子和进度到面板，不自动出声 */
+      cur = saved.cur;
+      elTitle.textContent = SONGS[cur].title;
+      elNo.textContent = 'TRACK ' + SONGS[cur].no + ' / ' + SONGS.length;
+      markCur();
+      audio.src = 'music/' + SONGS[cur].file;
+      pendingSeek = (saved.t && saved.t > 0) ? saved.t : -1;
+      elFill.style.width = '0%'; elCur.textContent = '0:00'; elDur.textContent = '--:--';
+    }
+  } else {
+    play(Math.floor(Math.random() * SONGS.length));
+  }
+  /* 离开页面（点链接去别的页面）前保存状态，供下一页续播；移动端 pagehide 不可靠，补 visibilitychange */
+  window.addEventListener('pagehide', function(){ saveState(true); });
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') saveState(true); });
+  /* 前进/后退从往返缓存（bfcache）恢复时：内存状态还在，直接续播，不重新加载 */
+  window.addEventListener('pageshow', function(e){
+    if (e.persisted && cur >= 0 && audio.paused){
+      var p = audio.play();
+      if (p && p.catch) p.catch(function(){});
+    }
+  });
+})();
+</script>
+
+<iframe id="siteFrame" src="home.html" title="Simon 的作品集"></iframe>
+
+<script>
+/* ============ 壳逻辑：音乐播放在壳层，页面切换发生在 iframe 里，永不中断 ============ */
+(function(){
+  var fr = document.getElementById('siteFrame');
+  function toFrame(p){
+    if (p === '/' || p === '/index.html') return 'home.html';
+    return p.replace(/^\//, '');
+  }
+  /* iframe 页面转发来的站内导航：换 iframe 内容（replace 不产生历史条目）+ 更新地址栏 */
+  window.addEventListener('message', function(e){
+    var d = e.data || {};
+    if (d.mpNav){
+      var p = d.mpNav;
+      try { fr.contentWindow.location.replace(toFrame(p)); } catch (err) { fr.src = toFrame(p); }
+      history.pushState(null, '', p);
+    } else if (d.mpLoaded){
+      if (d.title) document.title = d.title;
+      /* 首页内容在壳里显示时，地址栏始终归一为 / */
+      var shown = (d.url === '/home.html' || d.url === '/index.html') ? '/' : d.url;
+      if (shown && location.pathname !== shown) history.replaceState(null, '', shown);
+    }
+  });
+  /* 浏览器前进/后退：按地址栏目标换 iframe 内容，音乐不中断 */
+  window.addEventListener('popstate', function(){
+    var p = location.pathname;
+    try {
+      if (fr.contentWindow.location.pathname !== toFrame(p)) fr.contentWindow.location.replace(toFrame(p));
+    } catch (err) { fr.src = toFrame(p); }
+  });
+})();
+</script>
+
+</body></html>

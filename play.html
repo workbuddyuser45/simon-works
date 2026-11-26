@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html data-page-node-id="h5IBV6jj9hprTL82zSzXry" lang="zh-CN"><head data-page-node-id="Y4gOexFtOOihrMCuumytSR">
+<meta data-page-node-id="h1LD1XzvR3R9OKWH1QDqep" charset="UTF-8">
+<meta data-page-node-id="1E6ItW5nMp3BaJItiwRvAq" name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-page-node-id="KqGZsT5tSM9YYTguWvjAvw" data-pnid-children="xo6PPsWhXhzuAwH8snWyHh">Play — Simon</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style data-page-node-id="L0tYcYy6aSmTqANAd41T1K" data-pnid-children="0R8gOQaY2Ojhfg3EtYhE7m">
+  html{font-size:18px}  /* 13 英寸笔记本观看优化：根字号 16→18 */
+
+  /* ============================================================
+     Play 兴趣页 · 完全自包含（不依赖任何本地 CSS）
+     ============================================================ */
+  :root{
+    --paper:#F1F0EA;--ink:#1C1B18;
+    --yellow:#F5D915;--magenta:#C9316E;--navy:#1F4E9C;
+    --teal:#7FC9E8;--lime:#B9D93B;--coral:#F0907E;--sky:#A8DCE8;
+    --muted:#8b897f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;overflow-x:clip}
+  body{
+    font-family:"Noto Sans SC",sans-serif;
+    background:var(--paper);color:var(--ink);
+    overflow-x:hidden;position:relative;min-height:100vh;
+  }
+  a{color:inherit}
+
+  /* ============ 品牌区与目录入口 ============ */
+  .brand{
+    position:absolute;top:2.6rem;left:max(2rem, calc(50vw - 518px));z-index:10;
+    font-weight:700;font-size:1.6rem;letter-spacing:.22em;
+    text-decoration:none;color:var(--ink);
+  }
+  .menu{
+    position:absolute;top:2.4rem;right:3rem;z-index:11;
+    width:4.2rem;height:4.2rem;border-radius:50%;
+    background:#fff;cursor:pointer;
+    display:flex;flex-direction:column;gap:.5rem;
+    align-items:center;justify-content:center;
+    box-shadow:0 2px 14px rgba(28,27,24,.08);
+    transition:transform .25s ease;text-decoration:none;
+  }
+  .menu:hover{transform:scale(1.08)}
+  .menu span{display:block;width:1.5rem;height:2px;background:var(--ink);border-radius:2px}
+
+  /* ============ 有机色块 ============ */
+  .blob{
+    position:absolute;z-index:0;
+    mix-blend-mode:multiply;
+    background-color:var(--c);
+    animation:drift var(--d,14s) ease-in-out var(--dl,0s) infinite alternate;
+    will-change:transform;pointer-events:none;
+  }
+  .blob.dotted{
+    background-image:radial-gradient(var(--dot) 2.1px, transparent 2.5px);
+    background-size:11px 11px;
+  }
+  @keyframes drift{
+    0%  {transform:rotate(var(--r,0deg)) translate(0,0) scale(1)}
+    50% {transform:rotate(calc(var(--r,0deg) + 4deg)) translate(1.2%, -2%) scale(1.04)}
+    100%{transform:rotate(calc(var(--r,0deg) - 3deg)) translate(-1.5%, 1.5%) scale(.97)}
+  }
+
+  /* ============ 页面主体 ============ */
+  .page{
+    position:relative;z-index:2;
+    max-width:1100px;margin:0 auto;
+    padding:9rem 2rem 4rem;
+  }
+  .page-head{margin-bottom:2.8rem}
+  .page-head h1{
+    font-family:"Playfair Display",serif;
+    font-style:italic;font-weight:500;
+    font-size:clamp(2.6rem,5vw,4.2rem);line-height:1.1;
+  }
+  .page-head p{
+    margin-top:1rem;font-size:1.05rem;letter-spacing:.1em;color:var(--muted);
+  }
+
+  /* ============ 兴趣卡片 ============ */
+  .play-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:2rem;
+  }
+  .play-card{
+    background:#fff;border-radius:22px;
+    padding:2.2rem 2rem;
+    box-shadow:0 4px 20px rgba(28,27,24,.06);
+    transition:transform .3s ease,box-shadow .3s ease;
+  }
+  .play-card:hover{
+    transform:rotate(-1.2deg) scale(1.02);
+    box-shadow:0 14px 34px rgba(28,27,24,.12);
+  }
+  .play-card .emoji{font-size:2.6rem;line-height:1}
+  .play-card h3{margin-top:1rem;font-size:1.15rem}
+  .play-card h3 .en{
+    font-family:"Playfair Display",serif;font-style:italic;font-weight:500;
+    font-size:.95rem;color:var(--muted);margin-left:.6rem;
+  }
+  .play-card p{margin-top:.6rem;line-height:1.9;color:#3a3830;font-size:.92rem}
+  /* 卡片顶边装饰色条：每张卡换一个 --bar 颜色 */
+  .play-card{border-top:6px solid var(--bar,var(--yellow))}
+  /* 可点击的卡片（有子页面时用 <a class="play-card">） */
+  a.play-card{text-decoration:none;color:inherit;display:block;position:relative}
+  a.play-card .more{
+    display:inline-block;margin-top:1rem;font-size:.8rem;letter-spacing:.2em;
+    color:var(--magenta);opacity:0;transform:translateX(-8px);
+    transition:opacity .25s ease,transform .25s ease;
+  }
+  a.play-card:hover .more{opacity:1;transform:none}
+
+  /* ============ 封底 ============ */
+  .outro{
+    position:relative;z-index:2;overflow:hidden;
+    margin-top:5rem;min-height:54vh;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    text-align:center;padding:6rem 2rem 7rem;
+  }
+  .outro>*:not(.blob){position:relative;z-index:1}
+  .outro h2{
+    font-family:"Playfair Display",serif;
+    font-style:italic;font-weight:500;
+    font-size:clamp(2.4rem,4.8vw,3.8rem);line-height:1.15;
+  }
+  .outro .zh{margin-top:1.1rem;font-size:1rem;letter-spacing:.22em;color:var(--muted)}
+  .outro .top{
+    margin-top:2.4rem;width:3.6rem;height:3.6rem;border-radius:50%;
+    background:#fff;display:flex;align-items:center;justify-content:center;
+    text-decoration:none;font-size:1.3rem;color:var(--ink);
+    box-shadow:0 2px 14px rgba(28,27,24,.08);
+    transition:transform .25s ease;
+  }
+  .outro .top:hover{transform:translateY(-6px)}
+  .ob1{--c:var(--yellow);--dot:var(--magenta);--r:-10deg;--d:17s;
+      width:30vw;height:24vw;bottom:-14vw;left:-8vw;
+      border-radius:58% 42% 46% 54%/ 52% 58% 42% 48%;}
+  .ob2{--c:var(--teal);--dot:var(--navy);--r:14deg;--d:15s;
+      width:20vw;height:15vw;bottom:-8vw;left:14vw;
+      border-radius:46% 54% 62% 38%/ 58% 44% 56% 42%;}
+  .ob3{--c:var(--navy);--r:-20deg;--d:14s;
+      width:16vw;height:11vw;bottom:-4vw;right:-4vw;
+      border-radius:64% 36% 48% 52%/ 46% 64% 36% 54%;}
+  .ob4{--c:var(--lime);--r:8deg;--d:18s;
+      width:10vw;height:8vw;bottom:10vw;right:20vw;
+      border-radius:52% 48% 42% 58%/ 60% 42% 58% 40%;}
+  .ob5{--c:var(--coral);--r:-12deg;--d:13s;
+      width:6vw;height:4.5vw;top:6vw;left:18vw;
+      border-radius:56% 44% 52% 48%/ 50% 56% 44% 50%;}
+
+  /* ============ 回退 / 前进 ============ */
+  .pager{
+    position:relative;z-index:2;
+    max-width:1100px;margin:3.5rem auto 0;padding:0 2rem;
+    display:flex;justify-content:space-between;gap:1.2rem;flex-wrap:wrap;
+  }
+  .pager a{
+    display:flex;flex-direction:column;gap:.4rem;
+    padding:1.1rem 1.9rem;border-radius:20px;background:#fff;
+    border:2px dotted rgba(28,27,24,.28);text-decoration:none;
+    box-shadow:0 4px 18px rgba(28,27,24,.06);
+    transition:transform .25s ease,box-shadow .25s ease;
+  }
+  .pager a:hover{transform:translateY(-5px);box-shadow:0 12px 28px rgba(28,27,24,.12)}
+  .pager a:hover .pname{color:var(--magenta)}
+  .pager .dir{font-size:.75rem;letter-spacing:.28em;color:var(--muted)}
+  .pager .pname{
+    font-family:"Playfair Display",serif;font-style:italic;font-weight:500;
+    font-size:1.35rem;transition:color .2s;
+  }
+  .pager .next{align-items:flex-end;text-align:right}
+
+  /* ============ 页脚 ============ */
+  .site-footer{
+    position:relative;z-index:2;
+    padding:2.5rem;text-align:center;
+    color:var(--muted);font-size:.85rem;letter-spacing:.08em;
+  }
+
+  /* ============ 响应式 ============ */
+  @media (max-width:768px){
+    .brand{left:2rem;top:1.6rem}
+    .menu{right:1.4rem;top:1.4rem;width:3.4rem;height:3.4rem}
+    .page{padding-top:6rem}
+    .play-grid{grid-template-columns:1fr}
+    .outro{min-height:44vh}
+  }
+</style>
+<!-- SEO / 分享卡片 / 图标 -->
+<meta name="description" content="Play 兴趣爱好——Ride 机车笔记、Beauty、Weapon 武器评测、Tech 数码折腾，认真玩的各个领域。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Play — Simon">
+<meta property="og:description" content="Play 兴趣爱好——Ride 机车笔记、Beauty、Weapon 武器评测、Tech 数码折腾，认真玩的各个领域。">
+<meta property="og:url" content="https://routersamba.sh.cn/play.html">
+<meta property="og:image" content="https://routersamba.sh.cn/og-cover.jpg">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body data-page-node-id="cfLcBNaqOuFFTYhe6Fej8g">
+
+<!-- 顶部点缀色块 -->
+<div data-page-node-id="ydXDVtXIHKuSGxLHMXenfA" class="blob dotted" style="width:16vw;height:13vw;top:-6vw;left:-4vw;border-radius:46% 54% 62% 38%/58% 44% 56% 42%"></div>
+<div data-page-node-id="TGciHH64XxiinYYSjSGZuA" class="blob" style="width:8vw;height:6vw;top:6vw;left:12vw;border-radius:52% 48% 42% 58%/60% 42% 58% 40%"></div>
+<div data-page-node-id="xpnBvpirF4k9jl1TIFUfqt" class="blob" style="width:11vw;height:8vw;top:-4vw;right:-3vw;border-radius:56% 44% 52% 48%/50% 56% 44% 50%"></div>
+
+<a data-page-node-id="v0LUq891G0gzZmJHfXdO6b" class="brand" href="index.html">Simon</a>
+<a data-page-node-id="h5t9gzLM12aAsCjqleqwFS" class="menu" href="menu.html" aria-label="打开目录"><span data-page-node-id="ysF4CiBSP2KAvTeGrFo10J"></span><span data-page-node-id="IpGRaNWBmqoEWK4TASO2Z5"></span></a>
+
+<main data-page-node-id="iHIAmakLZnj81m969YAsBD" class="page">
+  <header data-page-node-id="ypeFJmCwPTYZqo836FmAuD" class="page-head">
+    <h1 data-page-node-id="kUNFqMSnqVu4DvG0Xx2yi0">Play</h1>
+    <p data-page-node-id="aFKUBtpLVEu88As1hoAs26">作品之外的一切热爱 —— 想加新爱好，复制一张卡片就行。</p>
+  </header>
+
+  <!-- 兴趣卡片：复制一个 <div class="play-card"> 就是新增一项 -->
+  <div data-page-node-id="eXOEAgnJfGoPYP32lbPZYf" class="play-grid">
+
+    <a data-page-node-id="CySXggeansT9AogEiLaaDD" class="play-card" href="ride.html">
+      <div data-page-node-id="ugqGMC0ZV9csj1GAaSpOHi" class="emoji">🏍️</div>
+      <h3 data-page-node-id="04iE0HSMASCeGHqKdJ4neh">摩托车<span data-page-node-id="TiIkdLcE2SPfZ4sGHpFCvN" class="en">Motorcycle</span></h3>
+      <p data-page-node-id="aslBrv1QvBPhlTbnOvQ8F7">速度与机械美学的合体。周末跑山是充电方式，弯道里没有烦恼；不骑的日子也会研究改装件和骑行装备，钱包因此常年贫血。</p>
+      <span data-page-node-id="IcksuVcr5qBxbFHSAopduP" class="more">进入 →</span>
+    </a>
+
+    <a data-page-node-id="B3WcM7XojdkMAYVhbPtUOO" class="play-card" href="beauty.html">
+      <div data-page-node-id="YlDbzCtqEqvN17v0cDOnDC" class="emoji">🌹</div>
+      <h3 data-page-node-id="CZlTFzi5q9xz5Yh88PEsdN">女人<span data-page-node-id="7FZcpLl0tIsVUHg5asQq3q" class="en">Beauty</span></h3>
+      <p data-page-node-id="Feo2cSxUON17fRKYpyJe8m">欣赏美是设计者的必修课。审美、气质、谈吐——研究「美为什么动人」，最后都会反哺到设计上。</p>
+      <span data-page-node-id="qa5kHrQBmRqLKnW7TnV0A5" class="more">进入 →</span>
+    </a>
+
+    <a data-page-node-id="aKFTwHB8oYYFxAKkWVhoxe" class="play-card" href="weapon.html">
+      <div data-page-node-id="Vu3oaRfL1JoHVZYrO9BjfC" class="emoji">⚔️</div>
+      <h3 data-page-node-id="Ue6YIwBAFycsUUtgOA57DK">武器<span data-page-node-id="IsFN0xCerhEb4jLECB84VF" class="en">Weaponry</span></h3>
+      <p data-page-node-id="JL1JkD45uM7qKAoODzX0wQ">着迷的是背后的机械结构与工业设计：从武士刀的弧度到枪械的公差。有机会就要亲自上手操作。</p>
+      <span data-page-node-id="htaV2Ro45BGfr2VlgEzsTH" class="more">进入 →</span>
+    </a>
+
+    <a data-page-node-id="L8HV6wMv55jcerKaMvqFxe" class="play-card" href="tech.html">
+      <div data-page-node-id="YpgcUfTZnj4WaD545CjurV" class="emoji">💻</div>
+      <h3 data-page-node-id="GeItPE2Vz0r5jVvGHCqCCt">计算机<span data-page-node-id="AoJaSlrYicgBJpLyfZgfmt" class="en">Computing</span></h3>
+      <p data-page-node-id="Elzrc6znLAA8kux2wQZAEZ">装机、折腾 Linux、给路由器刷WRT。这个网站就是闲得无聊时手搓的——学到的每一招都顺手用在作品里。</p>
+      <span data-page-node-id="QvdZds0OzaugMkZIZH9A3g" class="more">进入 →</span>
+    </a>
+
+  </div>
+</main>
+
+<!-- 回退 / 前进 -->
+<nav data-page-node-id="HiFxCcuVE04GzaL9ajaNnV" class="pager">
+  <a data-page-node-id="bvH6a8Vjs8F64YMmVsFC85" class="prev" href="works.html" title="回退到作品页"><span data-page-node-id="tnmQ1zakBNyGh3rwU2wHFh" class="dir">← 回退</span><span data-page-node-id="pXKUG7JFH6i78n9WIUkEhE" class="pname">Works · 设计作品</span></a>
+  <a class="next" href="about.html" title="前进到关于我"><span class="dir">前进 →</span><span class="pname">About · 关于我</span></a>
+
+</nav>
+
+<!-- 封底 -->
+<div data-page-node-id="S3skN1yccAtP4SWMJl1ByC" class="outro">
+  <div data-page-node-id="na1hGQyXwKlPTqEv6oeMPt" class="blob ob1 dotted"></div>
+  <div data-page-node-id="tmRVCo4c37vCtFrdCJQZT5" class="blob ob2 dotted"></div>
+  <div data-page-node-id="Y1IBpHYzjTTN47w8lI9fJ4" class="blob ob3"></div>
+  <div data-page-node-id="q1MWHh8VqypwLhTAXLN2Jo" class="blob ob4"></div>
+  <div data-page-node-id="xi2x7kDRtj5PhQ3ulLgHj7" class="blob ob5"></div>
+  <h2 data-page-node-id="V7Rmy2E0VrZElMGPEIqCZ4">Thanks for visiting!</h2>
+  <div data-page-node-id="kUW2KiA2swO0h0nyaVrLFS" class="zh">艰难做设计，认真地玩。</div>
+  <a data-page-node-id="6UAsCquBd2e5R00Jj833wJ" class="top" href="#" aria-label="回到顶部">↑</a>
+</div>
+
+<footer data-page-node-id="L6WcNd9IQqgroB7PA5HSCC" class="site-footer">© 2026 Simon — 艰难做设计，认真地玩。<span id="busuanzi_container_site_pv" style="display:none"> · 本站总访问 <span id="busuanzi_value_site_pv"></span> 次</span><span id="busuanzi_container_site_uv" style="display:none"> · <span id="busuanzi_value_site_uv"></span> 位访客</span></footer>
+
+
+
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- ============ 音乐播放器 ============ -->
+<style>
+  .mp-fab{position:fixed;top:7.4rem;right:3rem;z-index:12;width:4.2rem;height:4.2rem;border-radius:50%;background:#fff;border:none;cursor:pointer;box-shadow:0 2px 14px rgba(28,27,24,.08);display:flex;align-items:center;justify-content:center;transition:transform .25s ease;padding:0}
+  .mp-fab:hover{transform:scale(1.08)}
+  .mp-disc{width:3rem;height:3rem;border-radius:50%;display:block;position:relative;background:radial-gradient(circle, var(--yellow) 0 27%, #1C1B18 28% 58%, #3a3830 59% 70%, #1C1B18 71% 100%);animation:none}
+  .mp-disc::after{content:"";position:absolute;inset:37%;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}
+  .mp-fab.on .mp-disc{animation:mpspin 3.5s linear infinite}
+  @keyframes mpspin{to{transform:rotate(360deg)}}
+  .mp-panel{position:fixed;top:12.2rem;right:3rem;z-index:12;width:19rem;background:#fff;border:3px solid var(--ink);border-radius:1.2rem;box-shadow:8px 8px 0 rgba(28,27,24,.9);padding:1.1rem 1.2rem 1.2rem;display:none;transform-origin:top right}
+  .mp-panel.open{display:block;animation:mpin .22s ease}
+  @keyframes mpin{from{opacity:0;transform:translateY(-8px) scale(.96)}to{opacity:1;transform:none}}
+  .mp-title{font-family:"Playfair Display",serif;font-style:italic;font-weight:600;font-size:1.12rem;line-height:1.35;min-height:1.5em}
+  .mp-no{font-size:.7rem;letter-spacing:.22em;color:#8b897f;margin-top:.2rem}
+  .mp-bar{margin-top:.8rem;height:.55rem;background:var(--paper);border:2px solid var(--ink);border-radius:999px;cursor:pointer;position:relative;overflow:hidden;touch-action:none}
+  .mp-bar i{position:absolute;top:0;left:0;bottom:0;width:0%;background:var(--magenta);display:block;border-radius:999px}
+  .mp-time{display:flex;justify-content:space-between;font-size:.7rem;color:#8b897f;margin-top:.35rem;letter-spacing:.06em}
+  .mp-ctrl{display:flex;gap:.55rem;margin-top:.85rem;align-items:center}
+  .mp-btn{flex:1;height:2.5rem;border-radius:999px;border:2.5px solid var(--ink);background:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:transform .15s, box-shadow .15s;font-family:inherit;color:var(--ink);padding:0}
+  .mp-btn:hover{transform:translateY(-2px);box-shadow:3px 3px 0 var(--ink)}
+  .mp-btn.main{background:var(--yellow);font-size:1.1rem}
+  .mp-btn.listbtn{flex:0 0 2.5rem}
+  .mp-btn.listbtn.on{background:var(--teal)}
+  .mp-list{margin-top:.85rem;max-height:15rem;overflow-y:auto;border:2px solid var(--ink);border-radius:.8rem;background:var(--paper);display:none}
+  .mp-list.open{display:block}
+  .mp-list button{display:flex;gap:.6rem;width:100%;text-align:left;padding:.5rem .8rem;border:none;background:none;cursor:pointer;font-size:.82rem;font-family:inherit;color:var(--ink);border-bottom:1px dashed rgba(28,27,24,.18);align-items:baseline}
+  .mp-list button:last-child{border-bottom:none}
+  .mp-list button:hover{background:#fff}
+  .mp-list button.cur{background:var(--yellow);font-weight:700}
+  .mp-list .n{font-size:.68rem;color:#8b897f;flex:0 0 1.4em}
+  .mp-hint{position:fixed;top:12.4rem;right:3rem;z-index:13;background:#fff;border:2.5px solid var(--ink);border-radius:999px;box-shadow:5px 5px 0 var(--magenta);padding:.55rem 1.05rem;font-size:.8rem;font-weight:700;display:none;animation:mphint 1.3s ease infinite alternate;white-space:nowrap;cursor:pointer}
+  .mp-framed .mp-fab,.mp-framed .mp-panel,.mp-framed .mp-hint{display:none!important}
+  @keyframes mphint{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+  @media (max-width:768px){
+    .mp-fab{top:5.6rem;right:1.4rem;width:3.6rem;height:3.6rem}
+    .mp-disc{width:2.5rem;height:2.5rem}
+    .mp-panel{left:.8rem;right:.8rem;width:auto;top:10rem}
+    .mp-hint{top:9.8rem;right:1.4rem;font-size:.72rem;padding:.45rem .85rem}
+  }
+</style>
+<button class="mp-fab" id="mpFab" aria-label="音乐播放器" title="音乐播放器"><span class="mp-disc"></span></button>
+<div class="mp-hint" id="mpHint">点一下任意位置，随机放首歌 ♪</div>
+<div class="mp-panel" id="mpPanel">
+  <div class="mp-title" id="mpTitle">点播放，随机来一首</div>
+  <div class="mp-no" id="mpNo">MUSIC PLAYER</div>
+  <div class="mp-bar" id="mpBar"><i id="mpFill"></i></div>
+  <div class="mp-time"><span id="mpCur">0:00</span><span id="mpDur">--:--</span></div>
+  <div class="mp-ctrl">
+    <button class="mp-btn" id="mpPrev" title="上一首">⏮</button>
+    <button class="mp-btn main" id="mpPlay" title="播放 / 暂停">▶</button>
+    <button class="mp-btn" id="mpNext" title="下一首">⏭</button>
+    <button class="mp-btn listbtn" id="mpListBtn" title="曲目列表">☰</button>
+  </div>
+  <div class="mp-list" id="mpList"></div>
+</div>
+<audio id="mpAudio" preload="none"></audio>
+<script>
+(function(){
+  /* 壳模式（本页在 iframe 里）：隐藏本页播放器，拦截站内导航转发给壳，由壳统一出声 */
+  if (window.top !== window.self){
+    document.documentElement.classList.add('mp-framed');
+    document.addEventListener('click', function(e){
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a || !a.href || a.target === '_blank') return;
+      var u = new URL(a.href);
+      if (u.origin !== location.origin) return;                      /* 外链放行 */
+      if (u.pathname === location.pathname && u.hash) return;        /* 同页锚点放行 */
+      e.preventDefault();
+      e.stopPropagation();
+      try { window.parent.postMessage({ mpNav: u.pathname + u.search + u.hash }, '*'); } catch (err) {}
+    }, true);
+    try { window.parent.postMessage({ mpLoaded: true, url: location.pathname, title: document.title }, '*'); } catch (err) {}
+    return;
+  }
+  var SONGS=[
+    {no:"01",title:"無眠之惘",file:"01.ogg"},
+    {no:"02",title:"琴弦呀，琴弦",file:"02.ogg"},
+    {no:"03",title:"自由頌（巴揚版）",file:"03.ogg"},
+    {no:"04",title:"戍望者的歌",file:"04.ogg"},
+    {no:"05",title:"爐邊遐思",file:"05.ogg"},
+    {no:"06",title:"我曾經愛過你（管弦樂版）",file:"06.ogg"},
+    {no:"07",title:"自由頌",file:"07.ogg"},
+    {no:"08",title:"水上挽月",file:"08.ogg"},
+    {no:"09",title:"我曾經愛過你",file:"09.ogg"},
+    {no:"10",title:"蒼鏑呈光",file:"10.ogg"},
+    {no:"11",title:"燃燒的蠟炬",file:"11.ogg"},
+    {no:"12",title:"叩冰墾壤",file:"12.ogg"},
+    {no:"13",title:"故事中的故事",file:"13.ogg"},
+    {no:"14",title:"無淚的哀聲",file:"14.ogg"},
+    {no:"15",title:"沒有英雄的敘事詩",file:"15.ogg"},
+    {no:"16",title:"在荒涼的北國",file:"16.ogg"},
+    {no:"17",title:"荒山皚皚",file:"17.ogg"},
+    {no:"18",title:"睡鄉長夢",file:"18.ogg"},
+    {no:"19",title:"凡雪終融",file:"19.ogg"},
+    {no:"20",title:"如靄似檬",file:"20.ogg"},
+    {no:"21",title:"嘆往月光",file:"21.ogg"},
+    {no:"22",title:"愛得其所",file:"22.ogg"},
+    {no:"23",title:"迴環的水波",file:"23.ogg"},
+    {no:"24",title:"固執的冰風",file:"24.ogg"},
+    {no:"25",title:"疾行銳進",file:"25.ogg"},
+    {no:"26",title:"砥志研想",file:"26.ogg"},
+    {no:"27",title:"拂向柔風",file:"27.ogg"},
+    {no:"28",title:"致松針",file:"28.ogg"},
+    {no:"29",title:"落雪無聲",file:"29.ogg"},
+    {no:"30",title:"白日已在暗中",file:"30.ogg"},
+    {no:"31",title:"燒燈續晝",file:"31.ogg"},
+    {no:"32",title:"雪撫夜霜",file:"32.ogg"},
+    {no:"33",title:"如沐月中",file:"33.ogg"},
+    {no:"34",title:"墜歡莫拾",file:"34.ogg"},
+    {no:"35",title:"星與舫的幽歌",file:"35.ogg"},
+    {no:"36",title:"白樺林的夜曲",file:"36.ogg"},
+    {no:"37",title:"月上水影",file:"37.ogg"},
+    {no:"38",title:"潮汐藻歌",file:"38.ogg"},
+    {no:"39",title:"相逐妄出",file:"39.ogg"},
+    {no:"40",title:"疑似之間",file:"40.ogg"},
+    {no:"41",title:"渡往幽世",file:"41.ogg"},
+    {no:"42",title:"某與某的辯題",file:"42.ogg"},
+    {no:"43",title:"失魂靈的渡口",file:"43.ogg"},
+    {no:"44",title:"無吟者的詩章",file:"44.ogg"},
+    {no:"45",title:"蒼白的騎行",file:"45.ogg"},
+    {no:"46",title:"未束的誓言",file:"46.ogg"},
+    {no:"47",title:"念當終亡",file:"47.ogg"},
+    {no:"48",title:"無恆無生",file:"48.ogg"},
+    {no:"49",title:"既知身是夢",file:"49.ogg"},
+    {no:"50",title:"歸向雪都",file:"50.ogg"}
+  ];
+  var audio = document.getElementById('mpAudio'),
+      fab = document.getElementById('mpFab'),
+      panel = document.getElementById('mpPanel'),
+      elTitle = document.getElementById('mpTitle'),
+      elNo = document.getElementById('mpNo'),
+      elBar = document.getElementById('mpBar'),
+      elFill = document.getElementById('mpFill'),
+      elCur = document.getElementById('mpCur'),
+      elDur = document.getElementById('mpDur'),
+      bPlay = document.getElementById('mpPlay'),
+      bPrev = document.getElementById('mpPrev'),
+      bNext = document.getElementById('mpNext'),
+      bListBtn = document.getElementById('mpListBtn'),
+      elList = document.getElementById('mpList');
+  var cur = -1, wantPlay = false, pending = false, pendingSeek = -1, lastSave = 0;
+  var hintEl = document.getElementById('mpHint');
+  audio.volume = 0.55;  /* 不太响也不太轻 */
+  function showHint(){ hintEl.style.display = 'block'; }
+  function hideHint(){ hintEl.style.display = 'none'; }
+  /* 跨页记忆：切页前把曲号/进度/是否在播存进 sessionStorage，新页面无缝接上 */
+  function saveState(force){
+    if (cur < 0) return;
+    var now = Date.now();
+    if (!force && now - lastSave < 1000) return;
+    lastSave = now;
+    try {
+      sessionStorage.setItem('mpState', JSON.stringify({ cur: cur, t: audio.currentTime || 0, playing: !audio.paused }));
+    } catch (err) {}
+  }
+
+  var items = [];
+  SONGS.forEach(function(s, i){
+    var b = document.createElement('button');
+    var n = document.createElement('span'); n.className = 'n'; n.textContent = s.no;
+    var t = document.createElement('span'); t.textContent = s.title;
+    b.appendChild(n); b.appendChild(t);
+    b.addEventListener('click', function(){ play(i); });
+    elList.appendChild(b);
+    items.push(b);
+  });
+
+  function fmt(t){
+    if (!isFinite(t)) return '--:--';
+    t = Math.round(t);
+    return Math.floor(t/60) + ':' + ('0'+(t%60)).slice(-2);
+  }
+  function markCur(){
+    items.forEach(function(b, i){ b.classList.toggle('cur', i === cur); });
+    if (cur >= 0){
+      var li = items[cur];
+      if (li.scrollIntoView) li.scrollIntoView({block:'nearest'});
+    }
+  }
+  function play(i, seekTo){
+    cur = ((i % SONGS.length) + SONGS.length) % SONGS.length;
+    wantPlay = true;
+    pending = false;
+    pendingSeek = (seekTo && seekTo > 0) ? seekTo : -1;
+    hideHint();
+    audio.src = 'music/' + SONGS[cur].file;
+    var p = audio.play();
+    if (p) p.catch(function(){
+      /* 进站自动播放被浏览器拦截：曲子已选好，等访客任意一次点击/按键立刻响起 */
+      pending = true;
+      showHint();
+      armGesture();
+    });
+    elTitle.textContent = SONGS[cur].title;
+    elNo.textContent = 'TRACK ' + SONGS[cur].no + ' / ' + SONGS.length;
+    elFill.style.width = '0%';
+    elCur.textContent = '0:00';
+    elDur.textContent = '--:--';
+    markCur();
+  }
+  function randomPlay(){
+    var r;
+    do { r = Math.floor(Math.random() * SONGS.length); } while (r === cur && SONGS.length > 1);
+    play(r);
+  }
+  function toggle(){
+    pending = false;
+    hideHint();
+    if (audio.paused){
+      if (cur < 0) { randomPlay(); }        /* 第一次点播放：随机 */
+      else { audio.play().catch(function(){}); }
+    } else {
+      audio.pause();
+    }
+  }
+  bPlay.addEventListener('click', toggle);
+  bPrev.addEventListener('click', function(){ play(cur < 0 ? 0 : cur - 1); });
+  bNext.addEventListener('click', function(){ play(cur < 0 ? 0 : cur + 1); });
+  audio.addEventListener('play', function(){
+    bPlay.textContent = '⏸';
+    fab.classList.add('on');
+  });
+  audio.addEventListener('pause', function(){
+    bPlay.textContent = '▶';
+    fab.classList.remove('on');
+  });
+  audio.addEventListener('ended', function(){ saveState(true); play(cur + 1); });   /* 播完顺序接下一首 */
+  audio.addEventListener('timeupdate', function(){
+    if (audio.duration){
+      elFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      elCur.textContent = fmt(audio.currentTime);
+      saveState(false);
+    }
+  });
+  audio.addEventListener('loadedmetadata', function(){
+    if (audio.duration === Infinity){
+      /* Ogg/Opus 在部分浏览器拿不到总时长：先跳到结尾骗出真实时长再回到应到的位置 */
+      audio.currentTime = 1e7;
+      var restore = function(){
+        audio.removeEventListener('timeupdate', restore);
+        if (pendingSeek >= 0){
+          audio.currentTime = Math.min(pendingSeek, Math.max(0, audio.duration - 1));
+          pendingSeek = -1;
+        } else {
+          audio.currentTime = 0;
+        }
+        elDur.textContent = fmt(audio.duration);
+      };
+      audio.addEventListener('timeupdate', restore);
+    } else {
+      if (pendingSeek >= 0){
+        audio.currentTime = Math.min(pendingSeek, Math.max(0, audio.duration - 1));
+        pendingSeek = -1;
+      }
+      elDur.textContent = fmt(audio.duration);
+    }
+  });
+  /* 进度条：点击跳转 + 按住拖动 */
+  var dragging = false;
+  function seekFromEvent(e){
+    if (!audio.duration || audio.duration === Infinity) return;
+    var r = elBar.getBoundingClientRect();
+    var x = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    var ratio = Math.min(1, Math.max(0, (x - r.left) / r.width));
+    try { audio.currentTime = ratio * audio.duration; } catch (err) {}
+    elFill.style.width = (ratio * 100) + '%';
+    elCur.textContent = fmt(ratio * audio.duration);
+  }
+  elBar.addEventListener('pointerdown', function(e){
+    if (!audio.duration || audio.duration === Infinity) return;
+    dragging = true;
+    try { elBar.setPointerCapture(e.pointerId); } catch (err) {}
+    seekFromEvent(e);
+  });
+  elBar.addEventListener('pointermove', function(e){ if (dragging) seekFromEvent(e); });
+  elBar.addEventListener('pointerup', function(){ dragging = false; });
+  elBar.addEventListener('pointercancel', function(){ dragging = false; });
+  bListBtn.addEventListener('click', function(){
+    var open = elList.classList.toggle('open');
+    bListBtn.classList.toggle('on', open);
+    markCur();
+  });
+  fab.addEventListener('click', function(){
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) markCur();
+  });
+  /* 点面板外面收起面板 */
+  document.addEventListener('click', function(e){
+    if (!panel.classList.contains('open')) return;
+    if (panel.contains(e.target) || fab.contains(e.target)) return;
+    panel.classList.remove('open');
+    elList.classList.remove('open');
+    bListBtn.classList.remove('on');
+  });
+  function tryStart(){
+    if (!audio.paused || cur < 0) return true;
+    var p = audio.play();
+    if (p && p.catch){
+      p.catch(function(){
+        /* 这次仍被拦截：重新挂起等下一次交互（循环直到成功或用户手动操作） */
+        pending = true;
+        showHint();
+        armGesture();
+      });
+      return false;
+    }
+    return true;
+  }
+  function armGesture(){
+    ['pointerdown', 'touchstart', 'keydown'].forEach(function(ev){
+      document.addEventListener(ev, function go(){
+        document.removeEventListener(ev, go);
+        if (!pending) return;
+        pending = false;
+        hideHint();
+        tryStart();
+      }, { passive: true });
+    });
+  }
+  hintEl.addEventListener('click', function(){
+    pending = false;
+    hideHint();
+    tryStart();
+  });
+  /* 进站：有跨页记忆就无缝续播（换页前在播的曲子接着响、接着进度）；没有记忆则随机选曲开播 */
+  var saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem('mpState') || 'null'); } catch (err) {}
+  if (saved && typeof saved.cur === 'number' && saved.cur >= 0 && saved.cur < SONGS.length){
+    if (saved.playing){
+      hintEl.textContent = '点一下，继续放歌 ♪';
+      play(saved.cur, saved.t);
+    } else {
+      /* 上次切页时是暂停状态：恢复曲子和进度到面板，不自动出声 */
+      cur = saved.cur;
+      elTitle.textContent = SONGS[cur].title;
+      elNo.textContent = 'TRACK ' + SONGS[cur].no + ' / ' + SONGS.length;
+      markCur();
+      audio.src = 'music/' + SONGS[cur].file;
+      pendingSeek = (saved.t && saved.t > 0) ? saved.t : -1;
+      elFill.style.width = '0%'; elCur.textContent = '0:00'; elDur.textContent = '--:--';
+    }
+  } else {
+    play(Math.floor(Math.random() * SONGS.length));
+  }
+  /* 离开页面（点链接去别的页面）前保存状态，供下一页续播；移动端 pagehide 不可靠，补 visibilitychange */
+  window.addEventListener('pagehide', function(){ saveState(true); });
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') saveState(true); });
+  /* 前进/后退从往返缓存（bfcache）恢复时：内存状态还在，直接续播，不重新加载 */
+  window.addEventListener('pageshow', function(e){
+    if (e.persisted && cur >= 0 && audio.paused){
+      var p = audio.play();
+      if (p && p.catch) p.catch(function(){});
+    }
+  });
+})();
+</script>
+
+</body></html>

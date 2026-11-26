@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ride — Simon</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  html{font-size:18px}  /* 13 英寸笔记本观看优化：根字号 16→18 */
+
+  /* ============================================================
+     Ride 子页面 · 完全自包含（不依赖任何本地 CSS）
+     ============================================================ */
+  :root{
+    --paper:#F1F0EA;--ink:#1C1B18;
+    --yellow:#F5D915;--magenta:#C9316E;--navy:#1F4E9C;
+    --teal:#7FC9E8;--lime:#B9D93B;--coral:#F0907E;--sky:#A8DCE8;
+    --pink:#F2A6C4;
+    --muted:#8b897f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;overflow-x:clip}
+  body{
+    font-family:"Noto Sans SC",sans-serif;
+    background:var(--paper);color:var(--ink);
+    overflow-x:hidden;position:relative;min-height:100vh;
+  }
+  a{color:inherit}
+
+  /* ============ 品牌区与目录入口 ============ */
+  .brand{
+    position:absolute;top:2.6rem;left:max(2rem, calc(50vw - 448px));z-index:10;
+    font-weight:700;font-size:1.6rem;letter-spacing:.22em;
+    text-decoration:none;color:var(--ink);
+  }
+  .menu{
+    position:absolute;top:2.4rem;right:3rem;z-index:11;
+    width:4.2rem;height:4.2rem;border-radius:50%;
+    background:#fff;cursor:pointer;
+    display:flex;flex-direction:column;gap:.5rem;
+    align-items:center;justify-content:center;
+    box-shadow:0 2px 14px rgba(28,27,24,.08);
+    transition:transform .25s ease;text-decoration:none;
+  }
+  .menu:hover{transform:scale(1.08)}
+  .menu span{display:block;width:1.5rem;height:2px;background:var(--ink);border-radius:2px}
+
+  /* ============ 有机色块 ============ */
+  .blob{
+    position:absolute;z-index:0;
+    mix-blend-mode:multiply;
+    background-color:var(--c);
+    animation:drift var(--d,14s) ease-in-out var(--dl,0s) infinite alternate;
+    will-change:transform;pointer-events:none;
+  }
+  .blob.dotted{
+    background-image:radial-gradient(var(--dot) 2.1px, transparent 2.5px);
+    background-size:11px 11px;
+  }
+  @keyframes drift{
+    0%  {transform:rotate(var(--r,0deg)) translate(0,0) scale(1)}
+    50% {transform:rotate(calc(var(--r,0deg) + 4deg)) translate(1.2%, -2%) scale(1.04)}
+    100%{transform:rotate(calc(var(--r,0deg) - 3deg)) translate(-1.5%, 1.5%) scale(.97)}
+  }
+
+  /* ============ 标题区 ============ */
+  .page{
+    position:relative;z-index:2;
+    max-width:960px;margin:0 auto;
+    padding:7.5rem 2rem 0;
+  }
+  .crumb{display:inline-flex;align-items:center;gap:.4rem;font-size:.9rem;letter-spacing:.18em;font-weight:700;color:#fff;text-decoration:none;background:var(--ink);padding:.7rem 1.6rem;border-radius:999px;border:2.5px solid var(--ink);box-shadow:5px 5px 0 var(--accent,var(--magenta));transition:transform .25s ease,box-shadow .25s ease,color .2s}
+    .crumb:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--accent,var(--magenta));color:var(--accent,var(--magenta))}
+  .hero-h{margin-top:2.6rem}
+  .label{font-size:.8rem;letter-spacing:.34em;color:var(--muted)}
+  .hero-h h1{
+    font-family:"Playfair Display",serif;
+    font-style:italic;font-weight:600;
+    font-size:clamp(3.4rem,7.5vw,6.2rem);line-height:1.05;
+    margin-top:.6rem;
+  }
+  .hero-h .zh{margin-top:1rem;font-size:1rem;letter-spacing:.2em;color:var(--muted)}
+
+  /* ============ 导语 ============ */
+  .lead{
+    position:relative;z-index:2;
+    max-width:960px;margin:3.5rem auto 0;padding:0 2rem;
+    font-size:1.15rem;line-height:2;color:var(--ink);
+  }
+  .lead em{font-style:normal;background:linear-gradient(transparent 62%, var(--pink) 62%)}
+
+  /* ============ 版块标题 ============ */
+  .sec{
+    position:relative;z-index:2;
+    max-width:960px;margin:5.5rem auto 0;padding:0 2rem;
+  }
+  .sec-h{
+    display:flex;align-items:baseline;gap:1.2rem;
+    border-bottom:3px solid var(--ink);padding-bottom:.9rem;margin-bottom:2.2rem;
+  }
+  .sec-h .no{
+    font-family:"Playfair Display",serif;font-style:italic;font-weight:600;
+    font-size:2rem;color:var(--s,var(--magenta));
+  }
+  .sec-h h2{font-size:1.35rem;font-weight:700;letter-spacing:.12em}
+  .sec-h .en{margin-left:auto;font-size:.78rem;letter-spacing:.3em;color:var(--muted)}
+
+  /* ============ 卡片 ============ */
+  .card{
+    position:relative;z-index:2;
+    background:#fff;border-radius:26px;
+    border-top:8px solid var(--bar,var(--magenta));
+    box-shadow:0 6px 26px rgba(28,27,24,.07);
+    padding:2.4rem 2.6rem 2.6rem;margin-bottom:2.6rem;
+  }
+  .card .c-head{display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+  .card .c-head h3{font-size:1.5rem;font-weight:700;letter-spacing:.06em}
+  .card .c-head .en{
+    font-family:"Playfair Display",serif;font-style:italic;font-weight:500;
+    font-size:1.15rem;color:var(--bar,var(--magenta));
+  }
+  .card .c-head .tag{
+    margin-left:auto;font-size:.72rem;letter-spacing:.22em;color:var(--muted);
+    border:1px solid rgba(28,27,24,.22);border-radius:999px;padding:.3rem .9rem;
+  }
+  .card ul{list-style:none}
+  .card li{
+    position:relative;padding:.55rem 0 .55rem 1.5rem;
+    font-size:.95rem;line-height:1.75;color:#3d3c37;
+    break-inside:avoid;
+  }
+  .card li::before{
+    content:"";position:absolute;left:.2rem;top:1.15rem;
+    width:.55rem;height:.55rem;border-radius:50%;
+    background:var(--bar,var(--magenta));
+  }
+  .card li b{color:var(--ink);font-weight:700}
+  .cols{columns:2;column-gap:3rem}
+
+  /* ============ 历史高光 · 故事卡 ============ */
+  .story{
+    position:relative;z-index:2;
+    background:#fff;border-radius:26px;border-top:8px solid var(--magenta);
+    box-shadow:0 6px 26px rgba(28,27,24,.07);
+    padding:2.8rem 3rem 2.8rem;margin-bottom:2.6rem;
+    font-size:1.02rem;line-height:2.1;color:#3d3c37;
+  }
+  .story .st-kicker{
+    font-size:.78rem;letter-spacing:.3em;color:var(--muted);margin-bottom:1rem;
+  }
+  .story p+p{margin-top:1.4rem}
+  .story b{color:var(--ink)}
+  .story .hl{
+    background:linear-gradient(transparent 62%, var(--pink) 62%);
+    color:var(--ink);font-weight:500;
+  }
+
+  /* ============ 弯道圣经 · 守则高亮块 ============ */
+  .rule{
+    column-span:all;
+    margin:1.6rem 0 .8rem;padding:1.5rem 1.9rem;border-radius:18px;
+    background:var(--paper);
+    font-size:.98rem;line-height:1.9;color:var(--ink);
+    border-left:6px solid var(--bar,var(--magenta));
+  }
+  .rule .r-t{font-weight:700;letter-spacing:.12em;margin-bottom:.5rem}
+  .rule p+p{margin-top:.7rem}
+  .note{
+    column-span:all;
+    margin:1rem 0;padding:1.1rem 1.4rem;border-radius:14px;
+    background:rgba(245,217,21,.22);
+    font-size:.9rem;line-height:1.85;color:#3d3c37;
+  }
+  .note b{color:var(--ink)}
+
+  /* ============ 对照卡（汽车 / 模拟器） ============ */
+  .duo{
+    display:grid;grid-template-columns:1fr 1fr;gap:2.6rem;
+    align-items:start;
+  }
+
+  /* ============ 感想收尾 ============ */
+  .afterword{
+    position:relative;z-index:2;
+    max-width:960px;margin:5rem auto 0;padding:0 2rem;
+  }
+  .afterword blockquote{
+    background:#fff;border-radius:26px;border-top:8px solid var(--yellow);
+    box-shadow:0 6px 26px rgba(28,27,24,.07);
+    padding:2.6rem 2.8rem;font-size:1.08rem;line-height:2.1;color:var(--ink);
+  }
+  .afterword .who{
+    margin-top:1.6rem;font-size:.8rem;letter-spacing:.3em;color:var(--muted);
+  }
+
+  /* ============ 回退 / 前进 ============ */
+  .pager{
+    position:relative;z-index:2;
+    max-width:1000px;margin:4rem auto 0;padding:0 2rem;
+    display:flex;justify-content:space-between;gap:1.2rem;flex-wrap:wrap;
+  }
+  .pager a{display:inline-flex;flex-direction:column;gap:.35rem;padding:1.1rem 2.1rem;border-radius:999px;background:var(--ink);border:2.5px solid var(--ink);box-shadow:6px 6px 0 var(--accent,var(--magenta));text-decoration:none;transition:transform .25s ease,box-shadow .25s ease}
+    .pager a:hover{transform:translate(-3px,-3px);box-shadow:10px 10px 0 var(--accent,var(--magenta))}
+    .pager a:hover .pname{color:var(--accent,var(--magenta))}
+    .pager .dir{font-size:.85rem;letter-spacing:.28em;color:rgba(255,255,255,.95);font-weight:700}
+    .pager .pname{font-family:"Playfair Display",serif;font-style:italic;font-weight:600;font-size:1.4rem;color:#fff;transition:color .2s}
+  .pager .next{align-items:flex-end;text-align:right}
+
+  /* ============ 封底 ============ */
+  .outro{
+    position:relative;z-index:2;overflow:hidden;
+    margin-top:5rem;min-height:54vh;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    text-align:center;padding:6rem 2rem 7rem;
+  }
+  .outro>*:not(.blob){position:relative;z-index:1}
+  .outro h2{
+    font-family:"Playfair Display",serif;
+    font-style:italic;font-weight:500;
+    font-size:clamp(2.4rem,4.8vw,3.8rem);line-height:1.15;
+  }
+  .outro .zh{margin-top:1.1rem;font-size:1rem;letter-spacing:.22em;color:var(--muted)}
+  .outro .top{
+    margin-top:2.4rem;width:3.6rem;height:3.6rem;border-radius:50%;
+    background:#fff;display:flex;align-items:center;justify-content:center;
+    text-decoration:none;font-size:1.3rem;color:var(--ink);
+    box-shadow:0 2px 14px rgba(28,27,24,.08);
+    transition:transform .25s ease;
+  }
+  .outro .top:hover{transform:translateY(-6px)}
+  .ob1{--c:var(--magenta);--dot:var(--navy);--r:-10deg;--d:17s;
+      width:30vw;height:24vw;bottom:-14vw;left:-8vw;
+      border-radius:58% 42% 46% 54%/ 52% 58% 42% 48%;}
+  .ob2{--c:var(--yellow);--dot:var(--magenta);--r:14deg;--d:15s;
+      width:20vw;height:15vw;bottom:-8vw;left:14vw;
+      border-radius:46% 54% 62% 38%/ 58% 44% 56% 42%;}
+  .ob3{--c:var(--navy);--r:-20deg;--d:14s;
+      width:16vw;height:11vw;bottom:-4vw;right:-4vw;
+      border-radius:64% 36% 48% 52%/ 46% 64% 36% 54%;}
+  .ob4{--c:var(--teal);--r:8deg;--d:18s;
+      width:10vw;height:8vw;bottom:10vw;right:20vw;
+      border-radius:52% 48% 42% 58%/ 60% 42% 58% 40%;}
+  .ob5{--c:var(--lime);--r:-12deg;--d:13s;
+      width:6vw;height:4.5vw;top:6vw;left:18vw;
+      border-radius:56% 44% 52% 48%/ 50% 56% 44% 50%;}
+
+  /* ============ 底部粉色曲线（横向贯穿） ============ */
+  .swoosh{
+    position:relative;z-index:2;overflow:hidden;
+    margin-top:-2rem;line-height:0;pointer-events:none;
+  }
+  .swoosh svg{display:block;width:100%;height:clamp(96px,9.5vw,158px)}
+  .swoosh path{
+    fill:none;stroke-linecap:round;stroke-linejoin:round;
+    vector-effect:non-scaling-stroke;
+  }
+  .sw-line{stroke:var(--pink);stroke-width:clamp(18px,2.3vw,36px)}
+  .sw-thin{stroke:var(--magenta);stroke-width:clamp(3px,.32vw,5px);opacity:.5}
+
+  /* ============ 页脚 ============ */
+  .site-footer{
+    position:relative;z-index:2;
+    padding:2.5rem;text-align:center;
+    color:var(--muted);font-size:.85rem;letter-spacing:.08em;
+  }
+
+  /* ============ 响应式 ============ */
+  @media (max-width:768px){
+    .brand{left:2rem;top:1.6rem}
+    .menu{right:1.4rem;top:1.4rem;width:3.4rem;height:3.4rem}
+    .page{padding-top:6rem}
+    .cols{columns:1}
+    .duo{grid-template-columns:1fr}
+    .card{padding:1.8rem 1.5rem}
+    .story{padding:2rem 1.6rem}
+    .outro{min-height:44vh}
+  }
+</style>
+<!-- SEO / 分享卡片 / 图标 -->
+<meta name="description" content="Ride 机车笔记——路上的历史高光、《弯道圣经》观课笔记，以及一些反面教材。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ride — Simon">
+<meta property="og:description" content="Ride 机车笔记——路上的历史高光、《弯道圣经》观课笔记，以及一些反面教材。">
+<meta property="og:url" content="https://routersamba.sh.cn/ride.html">
+<meta property="og:image" content="https://routersamba.sh.cn/og-cover.jpg">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+
+<!-- 顶部点缀色块 -->
+<div class="blob dotted" style="--c:var(--magenta);--dot:var(--navy);--r:10deg;--d:16s;width:17vw;height:14vw;top:-7vw;right:-5vw;border-radius:58% 42% 46% 54%/ 52% 58% 42% 48%"></div>
+<div class="blob" style="--c:var(--yellow);--r:-10deg;--d:14s;width:8vw;height:6vw;top:7vw;right:14vw;border-radius:56% 44% 58% 42%/ 46% 58% 42% 54%"></div>
+<div class="blob" style="--c:var(--teal);--r:8deg;--d:15s;width:10vw;height:7vw;top:70vh;left:-4vw;border-radius:46% 54% 62% 38%/ 58% 44% 56% 42%"></div>
+
+<a class="brand" href="index.html">Simon</a>
+<a class="menu" href="menu.html" aria-label="打开目录"><span></span><span></span></a>
+
+<main class="page">
+
+  <!-- 返回上级 -->
+  <a class="crumb" style="--accent:var(--magenta)" href="play.html">← PLAY / 兴趣爱好</a>
+
+  <!-- 标题区 -->
+  <div class="hero-h">
+    <div class="label">NO. 03 — 之一</div>
+    <h1>Ride</h1>
+    <div class="zh">两轮的平衡，靠的是手上放松和脑里清醒。</div>
+  </div>
+
+</main>
+
+<!-- 导语 -->
+<p class="lead">
+  机车笔记：路上的<em>历史高光</em>、《弯道圣经》的观课笔记，以及一些反面教材——为什么我不碰汽车，为什么模拟器开不出真实感。
+</p>
+
+<!-- ============ 01 历史高光 ============ -->
+<section class="sec" style="--s:var(--magenta)">
+  <div class="sec-h">
+    <span class="no">01</span>
+    <h2>历史高光</h2>
+    <span class="en">SURVIVAL STORIES</span>
+  </div>
+
+  <article class="story">
+    <div class="st-kicker">▍钻车缝 · 主动选择与被迫求生</div>
+    <p>那都是钻车缝——只不过我的是<b>主动选择</b>，有的是<b>被迫求生</b>。</p>
+    <p>主动选择的，比如过弯时故意插入一辆汽车和摩托车之间穿过去，故意从<span class="hl">两辆卡车中间</span>穿过去。</p>
+    <p>被迫求生的一次：过弯时走神，没注意到前方卡车，被迫紧急直立车身减速，随后<span class="hl">左推把极限闪避</span>，再一个从容右推把躲掉第二辆卡车，成功活命。</p>
+    <p>还有一次，一辆汽车突然向右试图掉头，一个老太婆试图向左横穿马路，一切发生得太突然。我按了一下刹车，意识到<span class="hl">我已没有机会活命</span>——所幸他们俩都注意到了我，他们之间有个空隙，我微调姿态油门一拧，直接从他两中间极限穿过，随后一把重刹停在路口。</p>
+  </article>
+</section>
+
+<!-- ============ 02 弯道圣经笔记 ============ -->
+<section class="sec" style="--s:var(--navy)">
+  <div class="sec-h">
+    <span class="no">02</span>
+    <h2>弯道圣经 · 视频笔记</h2>
+    <span class="en">TWIST OF THE WRIST</span>
+  </div>
+
+  <!-- 惊慌信号 -->
+  <article class="card" style="--bar:var(--magenta)">
+    <div class="c-head">
+      <h3>八个惊慌信号</h3><span class="en">Survival Reactions</span>
+      <span class="tag">先认识敌人</span>
+    </div>
+    <ul class="cols">
+      <li><b>SR.1</b> 弯中慌乱增减油门</li>
+      <li><b>SR.2</b> 车的倾斜角度增加，但转向角度没有增加——人转车不转</li>
+      <li><b>SR.3</b> 拼命抓紧车把</li>
+      <li><b>SR.4</b> 视觉惊慌，眼睛到处乱看</li>
+      <li><b>SR.5</b> 眼睛瞄准了最不想撞上的东西</li>
+      <li><b>SR.6</b> 思维停滞——惊慌时眼睛看哪里就会去哪里</li>
+      <li><b>SR.7</b> 思维停滞时无法做出有效转向，整个人僵在车上</li>
+      <li><b>SR.8</b> 无法转向，只能猛刹车</li>
+    </ul>
+
+    <div class="rule">
+      <div class="r-t">▍油门控制第一守则</div>
+      <p>当油门打开后，要<b>均匀地、持续地、柔顺地贯穿整个弯道</b>。打滑是油门波动的副产物；车倾斜下去后，违反守则会降低本就有限的抓地力。</p>
+      <p>协调配合加油和直立车身的时机，可以最大限度地提升所有弯道的出弯速度——<b>不要等到车身完全垂直时再加油</b>。</p>
+      <p>良好的操控建立良好的抓地力，良好的抓地力依赖良好的减震运作：调教良好的车过弯时，减震运动幅度应保持在行程中间区域——这是甜点，前后减震都是。</p>
+      <p>碰到可预见的打滑，切油只会让事情更糟（突然收油本身就是打滑诱因），顺滑的收油会好得多。在有水或沙子的路面，不猛加油、不急刹、同样不切油——尽可能直立车身通过，倾斜角度越小越好。</p>
+      <p>弯中一收油，车身就会立起来并向弯外驶去；刹车、保持油门、加油太早太猛，全都一样。计算多少油门能让车保持稳定、足够抓地、保持线路——这就是油门控制的艺术。</p>
+    </div>
+
+    <div class="note"><b>两个可以违反第一守则的情况：</b>① 直立车身开始出弯、车身接近垂直时，可以更猛烈地操作油门；② 有牵引力控制系统时，弯中和出弯都可以更猛加油。（连续弯道也是例外——它实际是两个弯，可以在两弯之间收油或停止加油。）</div>
+
+    <div class="note"><b>26–28 分钟处的矛盾：</b>前面说「转向必须在加油前完成，转向完成后加油应该立刻开始，越早越好；过早的加油也不行」。<b>上下冲突，不过我看视频觉得下面是对的。</b></div>
+
+    <div class="rule">
+      <div class="r-t">▍侧挂与身体位置</div>
+      <p>常见的新手错误是<b>等到开始入弯才侧挂</b>——标准是在收油门前（入弯前）就把臀部移出做好准备。另一个错误是侧挂出来太多：够用就好，太多很奇怪，而且弊大于利。概括：<b>提前侧挂，但不要出来太多。</b></p>
+      <p>人和车倾斜角度相反（拧麻花）是错误路线；直立一般不好不坏；侧挂是正确路线——车身倾斜角减小、更贴合车身、身体更放松。<b>更小的倾斜角度等于更大油门和更佳操控。</b></p>
+      <p>靠下半身支撑身体，而不是上半身。高速过弯用单腿或双腿夹住油箱获得支撑，手肘可以靠在油箱上——总之不要拽车把、不要用车把支撑身体。摩托车打滑时更不能抓紧车把：<b>阻止前轮自我调整会导致高抛摔车。</b></p>
+    </div>
+
+    <div class="rule">
+      <div class="r-t">▍打滑与稳定性</div>
+      <p><b>前轮打滑三大原因：</b>① 入弯制动力过大；② 前轮过载（推头）——标准解决方案是恢复油门；③ 湿滑路面——和前轮对抗会导致摔车，让车自己调整，人放松车把，试着什么都不要做。</p>
+      <p>弯中减震无法处理车手的多余移动：提前侧挂好位置，不要乱动。来自车手的外力主要有两个——侧挂太晚导致的不稳定性，以及侧挂出来太多。</p>
+    </div>
+
+    <div class="rule">
+      <div class="r-t">▍线路与转向</div>
+      <p>弯道中无法稳定车身或摔车的三大原因：油门控制失误、进弯太快、<b>路线选择错误</b>——在任何弯道选错路线，都会让稳定车身和油门控制变得不可能。</p>
+      <p><b>转向三大基本原则：</b>从哪里开始转向；用多快的速度倾倒；倾斜角需要多大。</p>
+      <p>避免内线进弯和早进弯：<b>外线进弯和晚进弯</b>可以获得更佳操控、更快速度、更小的倾斜角和更短的倾斜时间。过于外侧也没什么用——选一条能帮你看得更远的线路。</p>
+      <p><b>快速倾倒的好处：</b>更多操控、更好自信、早点加油能提升油门控制、更好的抓地力、不用倾斜那么久。</p>
+    </div>
+  </article>
+
+  <div class="afterword" style="margin-top:0;padding:0">
+    <blockquote style="background:transparent;box-shadow:none;border:none;padding:0">
+      <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center">
+        <span style="background:#fff;border-radius:999px;padding:.7rem 1.6rem;font-size:.88rem;letter-spacing:.08em;box-shadow:0 3px 14px rgba(28,27,24,.06)">摔车五因素：路面因素 · 入弯姿势 · 刹车时机 · 开油时机 · 轮胎当前抓地力</span>
+      </div>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ============ 03 反面教材 ============ -->
+<section class="sec" style="--s:var(--teal)">
+  <div class="sec-h">
+    <span class="no">03</span>
+    <h2>反面教材</h2>
+    <span class="en">COUNTER CASES</span>
+  </div>
+
+  <div class="duo">
+    <article class="card" style="--bar:var(--teal);margin-bottom:0">
+      <div class="c-head">
+        <h3>神力科莎</h3><span class="en">Assetto Corsa</span>
+        <span class="tag">模拟器之壁</span>
+      </div>
+      <ul>
+        <li>对速度没有感知，看不清路</li>
+        <li>踩图马斯特 T300 法拉利的踏板，腿的姿势和角度始终怪怪的</li>
+        <li>不知道何时会失去抓地力</li>
+        <li>方向盘的力反馈除了莫名其妙的震动以外没有任何作用</li>
+        <li>看不见弯心——屏幕大小问题吧</li>
+        <li>方向盘不知该转多少</li>
+        <li>油门控制由于腿部姿势问题比较累人</li>
+        <li>摩托车 mod 极度不真实</li>
+      </ul>
+    </article>
+
+    <article class="card" style="--bar:var(--navy);margin-bottom:0">
+      <div class="c-head">
+        <h3>我和汽车</h3><span class="en">Not My Thing</span>
+        <span class="tag">天生不对付</span>
+      </div>
+      <ul>
+        <li>坐姿不适，车内空气不足，容易晕车；夏天巨热还有味道</li>
+        <li>上了车就浑身不适，心情会下降，专注困难</li>
+        <li>夏天的汽车很烫</li>
+        <li>坐久了屁股黏在座位上很难过</li>
+        <li>坐姿也很不适</li>
+        <li><b>最重要的：我无法理解汽车的转向角度，该用多少？</b></li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<!-- ============ 感想收尾 ============ -->
+<div class="afterword">
+  <blockquote>
+    <p>惊慌时眼睛看哪里就会去哪里——所以训练的第一课，是学会把眼睛放在想去的地方。</p>
+    <div class="who">— SIMON · 弯道圣经笔记</div>
+  </blockquote>
+</div>
+
+<!-- 回退 / 前进 -->
+<nav class="pager">
+  <a class="prev" style="--accent:var(--magenta)" href="play.html" title="回到兴趣页"><span class="dir">← 返回</span><span class="pname">Play · 兴趣爱好</span></a>
+</nav>
+
+<!-- 封底 -->
+<div class="outro">
+  <div class="blob ob1 dotted"></div>
+  <div class="blob ob2 dotted"></div>
+  <div class="blob ob3"></div>
+  <div class="blob ob4"></div>
+  <div class="blob ob5"></div>
+  <h2>Thanks for visiting!</h2>
+  <div class="zh">艰难做设计，认真地玩。</div>
+  <a class="top" href="#" aria-label="回到顶部">↑</a>
+</div>
+
+<!-- 底部粉色曲线：横向贯穿整页 -->
+<div class="swoosh" aria-hidden="true">
+  <svg viewBox="0 0 1440 180" preserveAspectRatio="none">
+    <path class="sw-line" d="M-60,112 C220,18 430,168 700,92 C930,28 1120,152 1500,66"/>
+    <path class="sw-thin" d="M-60,146 C200,62 420,196 690,126 C930,64 1130,186 1500,100"/>
+  </svg>
+</div>
+
+<footer class="site-footer">© 2026 Simon — 艰难做设计，认真地玩。<span id="busuanzi_container_site_pv" style="display:none"> · 本站总访问 <span id="busuanzi_value_site_pv"></span> 次</span><span id="busuanzi_container_site_uv" style="display:none"> · <span id="busuanzi_value_site_uv"></span> 位访客</span></footer>
+
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- ============ 音乐播放器 ============ -->
+<style>
+  .mp-fab{position:fixed;top:7.4rem;right:3rem;z-index:12;width:4.2rem;height:4.2rem;border-radius:50%;background:#fff;border:none;cursor:pointer;box-shadow:0 2px 14px rgba(28,27,24,.08);display:flex;align-items:center;justify-content:center;transition:transform .25s ease;padding:0}
+  .mp-fab:hover{transform:scale(1.08)}
+  .mp-disc{width:3rem;height:3rem;border-radius:50%;display:block;position:relative;background:radial-gradient(circle, var(--yellow) 0 27%, #1C1B18 28% 58%, #3a3830 59% 70%, #1C1B18 71% 100%);animation:none}
+  .mp-disc::after{content:"";position:absolute;inset:37%;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}
+  .mp-fab.on .mp-disc{animation:mpspin 3.5s linear infinite}
+  @keyframes mpspin{to{transform:rotate(360deg)}}
+  .mp-panel{position:fixed;top:12.2rem;right:3rem;z-index:12;width:19rem;background:#fff;border:3px solid var(--ink);border-radius:1.2rem;box-shadow:8px 8px 0 rgba(28,27,24,.9);padding:1.1rem 1.2rem 1.2rem;display:none;transform-origin:top right}
+  .mp-panel.open{display:block;animation:mpin .22s ease}
+  @keyframes mpin{from{opacity:0;transform:translateY(-8px) scale(.96)}to{opacity:1;transform:none}}
+  .mp-title{font-family:"Playfair Display",serif;font-style:italic;font-weight:600;font-size:1.12rem;line-height:1.35;min-height:1.5em}
+  .mp-no{font-size:.7rem;letter-spacing:.22em;color:#8b897f;margin-top:.2rem}
+  .mp-bar{margin-top:.8rem;height:.55rem;background:var(--paper);border:2px solid var(--ink);border-radius:999px;cursor:pointer;position:relative;overflow:hidden;touch-action:none}
+  .mp-bar i{position:absolute;top:0;left:0;bottom:0;width:0%;background:var(--magenta);display:block;border-radius:999px}
+  .mp-time{display:flex;justify-content:space-between;font-size:.7rem;color:#8b897f;margin-top:.35rem;letter-spacing:.06em}
+  .mp-ctrl{display:flex;gap:.55rem;margin-top:.85rem;align-items:center}
+  .mp-btn{flex:1;height:2.5rem;border-radius:999px;border:2.5px solid var(--ink);background:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:transform .15s, box-shadow .15s;font-family:inherit;color:var(--ink);padding:0}
+  .mp-btn:hover{transform:translateY(-2px);box-shadow:3px 3px 0 var(--ink)}
+  .mp-btn.main{background:var(--yellow);font-size:1.1rem}
+  .mp-btn.listbtn{flex:0 0 2.5rem}
+  .mp-btn.listbtn.on{background:var(--teal)}
+  .mp-list{margin-top:.85rem;max-height:15rem;overflow-y:auto;border:2px solid var(--ink);border-radius:.8rem;background:var(--paper);display:none}
+  .mp-list.open{display:block}
+  .mp-list button{display:flex;gap:.6rem;width:100%;text-align:left;padding:.5rem .8rem;border:none;background:none;cursor:pointer;font-size:.82rem;font-family:inherit;color:var(--ink);border-bottom:1px dashed rgba(28,27,24,.18);align-items:baseline}
+  .mp-list button:last-child{border-bottom:none}
+  .mp-list button:hover{background:#fff}
+  .mp-list button.cur{background:var(--yellow);font-weight:700}
+  .mp-list .n{font-size:.68rem;color:#8b897f;flex:0 0 1.4em}
+  .mp-hint{position:fixed;top:12.4rem;right:3rem;z-index:13;background:#fff;border:2.5px solid var(--ink);border-radius:999px;box-shadow:5px 5px 0 var(--magenta);padding:.55rem 1.05rem;font-size:.8rem;font-weight:700;display:none;animation:mphint 1.3s ease infinite alternate;white-space:nowrap;cursor:pointer}
+  .mp-framed .mp-fab,.mp-framed .mp-panel,.mp-framed .mp-hint{display:none!important}
+  @keyframes mphint{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+  @media (max-width:768px){
+    .mp-fab{top:5.6rem;right:1.4rem;width:3.6rem;height:3.6rem}
+    .mp-disc{width:2.5rem;height:2.5rem}
+    .mp-panel{left:.8rem;right:.8rem;width:auto;top:10rem}
+    .mp-hint{top:9.8rem;right:1.4rem;font-size:.72rem;padding:.45rem .85rem}
+  }
+</style>
+<button class="mp-fab" id="mpFab" aria-label="音乐播放器" title="音乐播放器"><span class="mp-disc"></span></button>
+<div class="mp-hint" id="mpHint">点一下任意位置，随机放首歌 ♪</div>
+<div class="mp-panel" id="mpPanel">
+  <div class="mp-title" id="mpTitle">点播放，随机来一首</div>
+  <div class="mp-no" id="mpNo">MUSIC PLAYER</div>
+  <div class="mp-bar" id="mpBar"><i id="mpFill"></i></div>
+  <div class="mp-time"><span id="mpCur">0:00</span><span id="mpDur">--:--</span></div>
+  <div class="mp-ctrl">
+    <button class="mp-btn" id="mpPrev" title="上一首">⏮</button>
+    <button class="mp-btn main" id="mpPlay" title="播放 / 暂停">▶</button>
+    <button class="mp-btn" id="mpNext" title="下一首">⏭</button>
+    <button class="mp-btn listbtn" id="mpListBtn" title="曲目列表">☰</button>
+  </div>
+  <div class="mp-list" id="mpList"></div>
+</div>
+<audio id="mpAudio" preload="none"></audio>
+<script>
+(function(){
+  /* 壳模式（本页在 iframe 里）：隐藏本页播放器，拦截站内导航转发给壳，由壳统一出声 */
+  if (window.top !== window.self){
+    document.documentElement.classList.add('mp-framed');
+    document.addEventListener('click', function(e){
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a || !a.href || a.target === '_blank') return;
+      var u = new URL(a.href);
+      if (u.origin !== location.origin) return;                      /* 外链放行 */
+      if (u.pathname === location.pathname && u.hash) return;        /* 同页锚点放行 */
+      e.preventDefault();
+      e.stopPropagation();
+      try { window.parent.postMessage({ mpNav: u.pathname + u.search + u.hash }, '*'); } catch (err) {}
+    }, true);
+    try { window.parent.postMessage({ mpLoaded: true, url: location.pathname, title: document.title }, '*'); } catch (err) {}
+    return;
+  }
+  var SONGS=[
+    {no:"01",title:"無眠之惘",file:"01.ogg"},
+    {no:"02",title:"琴弦呀，琴弦",file:"02.ogg"},
+    {no:"03",title:"自由頌（巴揚版）",file:"03.ogg"},
+    {no:"04",title:"戍望者的歌",file:"04.ogg"},
+    {no:"05",title:"爐邊遐思",file:"05.ogg"},
+    {no:"06",title:"我曾經愛過你（管弦樂版）",file:"06.ogg"},
+    {no:"07",title:"自由頌",file:"07.ogg"},
+    {no:"08",title:"水上挽月",file:"08.ogg"},
+    {no:"09",title:"我曾經愛過你",file:"09.ogg"},
+    {no:"10",title:"蒼鏑呈光",file:"10.ogg"},
+    {no:"11",title:"燃燒的蠟炬",file:"11.ogg"},
+    {no:"12",title:"叩冰墾壤",file:"12.ogg"},
+    {no:"13",title:"故事中的故事",file:"13.ogg"},
+    {no:"14",title:"無淚的哀聲",file:"14.ogg"},
+    {no:"15",title:"沒有英雄的敘事詩",file:"15.ogg"},
+    {no:"16",title:"在荒涼的北國",file:"16.ogg"},
+    {no:"17",title:"荒山皚皚",file:"17.ogg"},
+    {no:"18",title:"睡鄉長夢",file:"18.ogg"},
+    {no:"19",title:"凡雪終融",file:"19.ogg"},
+    {no:"20",title:"如靄似檬",file:"20.ogg"},
+    {no:"21",title:"嘆往月光",file:"21.ogg"},
+    {no:"22",title:"愛得其所",file:"22.ogg"},
+    {no:"23",title:"迴環的水波",file:"23.ogg"},
+    {no:"24",title:"固執的冰風",file:"24.ogg"},
+    {no:"25",title:"疾行銳進",file:"25.ogg"},
+    {no:"26",title:"砥志研想",file:"26.ogg"},
+    {no:"27",title:"拂向柔風",file:"27.ogg"},
+    {no:"28",title:"致松針",file:"28.ogg"},
+    {no:"29",title:"落雪無聲",file:"29.ogg"},
+    {no:"30",title:"白日已在暗中",file:"30.ogg"},
+    {no:"31",title:"燒燈續晝",file:"31.ogg"},
+    {no:"32",title:"雪撫夜霜",file:"32.ogg"},
+    {no:"33",title:"如沐月中",file:"33.ogg"},
+    {no:"34",title:"墜歡莫拾",file:"34.ogg"},
+    {no:"35",title:"星與舫的幽歌",file:"35.ogg"},
+    {no:"36",title:"白樺林的夜曲",file:"36.ogg"},
+    {no:"37",title:"月上水影",file:"37.ogg"},
+    {no:"38",title:"潮汐藻歌",file:"38.ogg"},
+    {no:"39",title:"相逐妄出",file:"39.ogg"},
+    {no:"40",title:"疑似之間",file:"40.ogg"},
+    {no:"41",title:"渡往幽世",file:"41.ogg"},
+    {no:"42",title:"某與某的辯題",file:"42.ogg"},
+    {no:"43",title:"失魂靈的渡口",file:"43.ogg"},
+    {no:"44",title:"無吟者的詩章",file:"44.ogg"},
+    {no:"45",title:"蒼白的騎行",file:"45.ogg"},
+    {no:"46",title:"未束的誓言",file:"46.ogg"},
+    {no:"47",title:"念當終亡",file:"47.ogg"},
+    {no:"48",title:"無恆無生",file:"48.ogg"},
+    {no:"49",title:"既知身是夢",file:"49.ogg"},
+    {no:"50",title:"歸向雪都",file:"50.ogg"}
+  ];
+  var audio = document.getElementById('mpAudio'),
+      fab = document.getElementById('mpFab'),
+      panel = document.getElementById('mpPanel'),
+      elTitle = document.getElementById('mpTitle'),
+      elNo = document.getElementById('mpNo'),
+      elBar = document.getElementById('mpBar'),
+      elFill = document.getElementById('mpFill'),
+      elCur = document.getElementById('mpCur'),
+      elDur = document.getElementById('mpDur'),
+      bPlay = document.getElementById('mpPlay'),
+      bPrev = document.getElementById('mpPrev'),
+      bNext = document.getElementById('mpNext'),
+      bListBtn = document.getElementById('mpListBtn'),
+      elList = document.getElementById('mpList');
+  var cur = -1, wantPlay = false, pending = false, pendingSeek = -1, lastSave = 0;
+  var hintEl = document.getElementById('mpHint');
+  audio.volume = 0.55;  /* 不太响也不太轻 */
+  function showHint(){ hintEl.style.display = 'block'; }
+  function hideHint(){ hintEl.style.display = 'none'; }
+  /* 跨页记忆：切页前把曲号/进度/是否在播存进 sessionStorage，新页面无缝接上 */
+  function saveState(force){
+    if (cur < 0) return;
+    var now = Date.now();
+    if (!force && now - lastSave < 1000) return;
+    lastSave = now;
+    try {
+      sessionStorage.setItem('mpState', JSON.stringify({ cur: cur, t: audio.currentTime || 0, playing: !audio.paused }));
+    } catch (err) {}
+  }
+
+  var items = [];
+  SONGS.forEach(function(s, i){
+    var b = document.createElement('button');
+    var n = document.createElement('span'); n.className = 'n'; n.textContent = s.no;
+    var t = document.createElement('span'); t.textContent = s.title;
+    b.appendChild(n); b.appendChild(t);
+    b.addEventListener('click', function(){ play(i); });
+    elList.appendChild(b);
+    items.push(b);
+  });
+
+  function fmt(t){
+    if (!isFinite(t)) return '--:--';
+    t = Math.round(t);
+    return Math.floor(t/60) + ':' + ('0'+(t%60)).slice(-2);
+  }
+  function markCur(){
+    items.forEach(function(b, i){ b.classList.toggle('cur', i === cur); });
+    if (cur >= 0){
+      var li = items[cur];
+      if (li.scrollIntoView) li.scrollIntoView({block:'nearest'});
+    }
+  }
+  function play(i, seekTo){
+    cur = ((i % SONGS.length) + SONGS.length) % SONGS.length;
+    wantPlay = true;
+    pending = false;
+    pendingSeek = (seekTo && seekTo > 0) ? seekTo : -1;
+    hideHint();
+    audio.src = 'music/' + SONGS[cur].file;
+    var p = audio.play();
+    if (p) p.catch(function(){
+      /* 进站自动播放被浏览器拦截：曲子已选好，等访客任意一次点击/按键立刻响起 */
+      pending = true;
+      showHint();
+      armGesture();
+    });
+    elTitle.textContent = SONGS[cur].title;
+    elNo.textContent = 'TRACK ' + SONGS[cur].no + ' / ' + SONGS.length;
+    elFill.style.width = '0%';
+    elCur.textContent = '0:00';
+    elDur.textContent = '--:--';
+    markCur();
+  }
+  function randomPlay(){
+    var r;
+    do { r = Math.floor(Math.random() * SONGS.length); } while (r === cur && SONGS.length > 1);
+    play(r);
+  }
+  function toggle(){
+    pending = false;
+    hideHint();
+    if (audio.paused){
+      if (cur < 0) { randomPlay(); }        /* 第一次点播放：随机 */
+      else { audio.play().catch(function(){}); }
+    } else {
+      audio.pause();
+    }
+  }
+  bPlay.addEventListener('click', toggle);
+  bPrev.addEventListener('click', function(){ play(cur < 0 ? 0 : cur - 1); });
+  bNext.addEventListener('click', function(){ play(cur < 0 ? 0 : cur + 1); });
+  audio.addEventListener('play', function(){
+    bPlay.textContent = '⏸';
+    fab.classList.add('on');
+  });
+  audio.addEventListener('pause', function(){
+    bPlay.textContent = '▶';
+    fab.classList.remove('on');
+  });
+  audio.addEventListener('ended', function(){ saveState(true); play(cur + 1); });   /* 播完顺序接下一首 */
+  audio.addEventListener('timeupdate', function(){
+    if (audio.duration){
+      elFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      elCur.textContent = fmt(audio.currentTime);
+      saveState(false);
+    }
+  });
+  audio.addEventListener('loadedmetadata', function(){
+    if (audio.duration === Infinity){
+      /* Ogg/Opus 在部分浏览器拿不到总时长：先跳到结尾骗出真实时长再回到应到的位置 */
+      audio.currentTime = 1e7;
+      var restore = function(){
+        audio.removeEventListener('timeupdate', restore);
+        if (pendingSeek >= 0){
+          audio.currentTime = Math.min(pendingSeek, Math.max(0, audio.duration - 1));
+          pendingSeek = -1;
+        } else {
+          audio.currentTime = 0;
+        }
+        elDur.textContent = fmt(audio.duration);
+      };
+      audio.addEventListener('timeupdate', restore);
+    } else {
+      if (pendingSeek >= 0){
+        audio.currentTime = Math.min(pendingSeek, Math.max(0, audio.duration - 1));
+        pendingSeek = -1;
+      }
+      elDur.textContent = fmt(audio.duration);
+    }
+  });
+  /* 进度条：点击跳转 + 按住拖动 */
+  var dragging = false;
+  function seekFromEvent(e){
+    if (!audio.duration || audio.duration === Infinity) return;
+    var r = elBar.getBoundingClientRect();
+    var x = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    var ratio = Math.min(1, Math.max(0, (x - r.left) / r.width));
+    try { audio.currentTime = ratio * audio.duration; } catch (err) {}
+    elFill.style.width = (ratio * 100) + '%';
+    elCur.textContent = fmt(ratio * audio.duration);
+  }
+  elBar.addEventListener('pointerdown', function(e){
+    if (!audio.duration || audio.duration === Infinity) return;
+    dragging = true;
+    try { elBar.setPointerCapture(e.pointerId); } catch (err) {}
+    seekFromEvent(e);
+  });
+  elBar.addEventListener('pointermove', function(e){ if (dragging) seekFromEvent(e); });
+  elBar.addEventListener('pointerup', function(){ dragging = false; });
+  elBar.addEventListener('pointercancel', function(){ dragging = false; });
+  bListBtn.addEventListener('click', function(){
+    var open = elList.classList.toggle('open');
+    bListBtn.classList.toggle('on', open);
+    markCur();
+  });
+  fab.addEventListener('click', function(){
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) markCur();
+  });
+  /* 点面板外面收起面板 */
+  document.addEventListener('click', function(e){
+    if (!panel.classList.contains('open')) return;
+    if (panel.contains(e.target) || fab.contains(e.target)) return;
+    panel.classList.remove('open');
+    elList.classList.remove('open');
+    bListBtn.classList.remove('on');
+  });
+  function tryStart(){
+    if (!audio.paused || cur < 0) return true;
+    var p = audio.play();
+    if (p && p.catch){
+      p.catch(function(){
+        /* 这次仍被拦截：重新挂起等下一次交互（循环直到成功或用户手动操作） */
+        pending = true;
+        showHint();
+        armGesture();
+      });
+      return false;
+    }
+    return true;
+  }
+  function armGesture(){
+    ['pointerdown', 'touchstart', 'keydown'].forEach(function(ev){
+      document.addEventListener(ev, function go(){
+        document.removeEventListener(ev, go);
+        if (!pending) return;
+        pending = false;
+        hideHint();
+        tryStart();
+      }, { passive: true });
+    });
+  }
+  hintEl.addEventListener('click', function(){
+    pending = false;
+    hideHint();
+    tryStart();
+  });
+  /* 进站：有跨页记忆就无缝续播（换页前在播的曲子接着响、接着进度）；没有记忆则随机选曲开播 */
+  var saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem('mpState') || 'null'); } catch (err) {}
+  if (saved && typeof saved.cur === 'number' && saved.cur >= 0 && saved.cur < SONGS.length){
+    if (saved.playing){
+      hintEl.textContent = '点一下，继续放歌 ♪';
+      play(saved.cur, saved.t);
+    } else {
+      /* 上次切页时是暂停状态：恢复曲子和进度到面板，不自动出声 */
+      cur = saved.cur;
+      elTitle.textContent = SONGS[cur].title;
+      elNo.textContent = 'TRACK ' + SONGS[cur].no + ' / ' + SONGS.length;
+      markCur();
+      audio.src = 'music/' + SONGS[cur].file;
+      pendingSeek = (saved.t && saved.t > 0) ? saved.t : -1;
+      elFill.style.width = '0%'; elCur.textContent = '0:00'; elDur.textContent = '--:--';
+    }
+  } else {
+    play(Math.floor(Math.random() * SONGS.length));
+  }
+  /* 离开页面（点链接去别的页面）前保存状态，供下一页续播；移动端 pagehide 不可靠，补 visibilitychange */
+  window.addEventListener('pagehide', function(){ saveState(true); });
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') saveState(true); });
+  /* 前进/后退从往返缓存（bfcache）恢复时：内存状态还在，直接续播，不重新加载 */
+  window.addEventListener('pageshow', function(e){
+    if (e.persisted && cur >= 0 && audio.paused){
+      var p = audio.play();
+      if (p && p.catch) p.catch(function(){});
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

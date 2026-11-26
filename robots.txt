@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://routersamba.sh.cn/sitemap.xml
